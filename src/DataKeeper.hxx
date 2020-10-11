@@ -15,6 +15,8 @@ private:
 	size_t m_nb_steps;
 	double m_t_max;
 	double m_theta;
+	double m_accuracy;
+	size_t m_max_nb_iterations;
 
 	size_t m_nb_nodes;
 	size_t m_nb_cells;
@@ -34,6 +36,8 @@ public:
 	double get_mu() const;
 	double get_t_max() const;
 	double get_theta() const;
+	double get_accuracy() const;
+	size_t get_max_nb_iterations() const;
 
 	size_t get_nb_steps() const;
 	size_t get_nb_nodes() const;
@@ -45,6 +49,8 @@ public:
 	void set_mu(double mu);
 	void set_t_max(double t_max);
 	void set_theta(double theta);
+	void set_accuracy(double accuracy);
+	void set_max_nb_iterations(size_t max_nb_iterations);
 
 	double get_rho(size_t t, size_t node_nb) const;
 	void set_rho(size_t t, size_t node_nb, double rho);
@@ -60,6 +66,8 @@ public:
 	
 	void erase_BCs();
 	void add_BC(size_t node_nb, Vec3D E, Vec3D B);
+
+	bool boundary_node(size_t node_nb) const;
 
 	void save(std::string file) const;
 };

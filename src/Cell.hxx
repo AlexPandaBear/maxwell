@@ -19,6 +19,23 @@ public:
 	Cell();
 	~Cell();
 
-	size_t get_node_id(size_t node_nb) const
+	size_t get_node_id(size_t node_nb) const;
+	
+	double get_volume() const;
+
+	double get_ddx_lamb0() const;
+	double get_ddx_lamb1() const;
+	double get_ddx_lamb2() const;
+	double get_ddx_lamb3() const;
+
+	double get_ddy_lamb0() const;
+	double get_ddy_lamb1() const;
+	double get_ddy_lamb2() const;
+	double get_ddy_lamb3() const;
+
+	double get_ddz_lamb0() const;
+	double get_ddz_lamb1() const;
+	double get_ddz_lamb2() const;
+	double get_ddz_lamb3() const;
 	
 };

@@ -19,5 +19,5 @@ public:
 	void set_x(double x);
 	void set_y(double y);
 	void set_z(double z);
-	void set(double x, double y, double z);	
+	void set(double x, double y, double z);
 };

@@ -14,10 +14,12 @@ void SimManager::set_constants(double epsilon, double mu)
 	m_data.set_mu(mu);
 }
 
-void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double theta, size_t nb_pts, size_t nb_cells)
+void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double theta, double accuracy, size_t max_nb_iterations, size_t nb_pts, size_t nb_cells)
 {
 	m_data.set_t_max(t_max);
 	m_data.set_theta(theta);
+	m_data.set_accuracy(accuracy);
+	m_data.set_max_nb_iterations(max_nb_iterations);
 	m_data.reset_dimensions(nb_steps, nb_pts, nb_cells);
 	m_data.erase_BCs();
 }
