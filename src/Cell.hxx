@@ -1,13 +1,14 @@
 #pragma once
 
+#include <cstddef>
+#include <stdexcept>
 #include "Node.hxx"
 #include "Vec3D.hxx"
 
 class Cell
 {
 private:
-	const size_t m_N0_id, m_N1_id, m_N2_id, m_N3_id;
-	const Node &m_N0, &m_N1, &m_N2, &m_N3;
+	Node m_N0, m_N1, m_N2, m_N3;
 	
 	double m_volume;
 	double m_ddx_lamb0, m_ddy_lamb0, m_ddz_lamb0;
@@ -17,10 +18,15 @@ private:
 
 public:
 	Cell();
+	Cell(Node const& N0, Node const& N1, Node const& N2, Node const& N3);
+	Cell(Cell const& cell);
 	~Cell();
 
-	size_t get_node_id(size_t node_nb) const;
-	
+	void compute_nodes();
+
+	Node const& get_node(size_t node_nb) const;
+	bool contains(size_t node_nb) const;
+
 	double get_volume() const;
 
 	double get_ddx_lamb0() const;
@@ -38,4 +44,5 @@ public:
 	double get_ddz_lamb2() const;
 	double get_ddz_lamb3() const;
 	
+	Cell operator=(Cell const& cell);
 };

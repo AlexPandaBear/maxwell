@@ -1,11 +1,9 @@
 #include "BoundaryCondition.hxx"
 
-BoundaryCondition::BoundaryCondition(size_t node_nb, double Ex, double Ey, double Bx, double By) :
+BoundaryCondition::BoundaryCondition(size_t node_nb, Vec3D E, Vec3D B) :
 	m_node_nb(node_nb),
-	m_Ex(Ex),
-	m_Ey(Ey),
-	m_Bx(Bx),
-	m_By(By) {}
+	m_E(E),
+	m_B(B) {}
 
 BoundaryCondition::~BoundaryCondition() {}
 
@@ -14,22 +12,12 @@ size_t BoundaryCondition::get_node_nb() const
 	return m_node_nb;
 }
 
-double BoundaryCondition::get_Ex() const
+Vec3D BoundaryCondition::get_E() const
 {
-	return m_Ex;
+	return m_E;
 }
 
-double BoundaryCondition::get_Ey() const
+Vec3D BoundaryCondition::get_B() const
 {
-	return m_Ey;
-}
-
-double BoundaryCondition::get_Bx() const
-{
-	return m_Bx;
-}
-
-double BoundaryCondition::get_By() const
-{
-	return m_By;
+	return m_B;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <vector>
 #include <list>
 #include <string>
@@ -21,11 +22,11 @@ private:
 	size_t m_nb_nodes;
 	size_t m_nb_cells;
 
-	Field<double> m_rho;
-	Field<Vec3D> m_j;
-	Field<Vec3D> m_E, m_B;
+	std::vector<Field<double>> m_rho;
+	std::vector<Field<Vec3D>> m_j;
+	std::vector<Field<Vec3D>> m_E, m_B;
 
-	std::list<BoundaryCondition> m_BC;
+	std::vector<BoundaryCondition> m_BC;
 
 public:
 	DataKeeper();
@@ -66,8 +67,12 @@ public:
 	
 	void erase_BCs();
 	void add_BC(size_t node_nb, Vec3D E, Vec3D B);
+	Vec3D get_boundary_condition_E(size_t node_nb) const;
+	Vec3D get_boundary_condition_B(size_t node_nb) const;
 
 	bool boundary_node(size_t node_nb) const;
+
+	bool check_ID_BC_compatibility() const;
 
 	void save(std::string file) const;
 };

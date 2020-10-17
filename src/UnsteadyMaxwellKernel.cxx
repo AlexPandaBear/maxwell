@@ -1,15 +1,16 @@
 #include "UnsteadyMaxwellKernel.hxx"
 
-UnsteadyMaxwellKernel::UnsteadyMaxwellKernel(Mesh& mesh, DataKeeper& data) :
+UnsteadyMaxwellKernel::UnsteadyMaxwellKernel(Mesh3D& mesh, DataKeeper& data) :
 	m_eps(data.get_epsilon()),
 	m_mu(data.get_mu()),
 	m_nb_steps(data.get_nb_steps()),
 	m_t_max(data.get_t_max()),
+	m_dt(m_t_max/m_nb_steps),
 	m_theta(data.get_theta()),
 	m_accuracy(data.get_accuracy()),
 	m_max_nb_iterations(data.get_max_nb_iterations()),
 	m_nb_nodes(data.get_nb_nodes()),
-	m_nb_cells(data.get_nb_triangles()),
+	m_nb_cells(data.get_nb_cells()),
 	m_mesh(mesh),
 	m_data(data),
 	mat_A(6*m_nb_nodes),
@@ -18,13 +19,62 @@ UnsteadyMaxwellKernel::UnsteadyMaxwellKernel(Mesh& mesh, DataKeeper& data) :
 
 UnsteadyMaxwellKernel::~UnsteadyMaxwellKernel() {}
 
-void UnsteadyMaxwellKernel::check_ID_BC_compatibility() const;
-
-void UnsteadyMaxwellKernel::check_divergence_in_ID() const;
-
 bool UnsteadyMaxwellKernel::boundary_node(size_t node_nb) const
 {
 	return m_data.boundary_node(node_nb);
+}
+
+bool UnsteadyMaxwellKernel::check_divergence_in_ID() const
+{
+	double divE, divB;
+	Cell cell(m_mesh.get_cell(0));
+
+	for (size_t c = 0; c < m_nb_cells; c++)
+	{
+		divE = 0.;
+		divB = 0.;
+		cell = m_mesh.get_cell(c);
+
+		divE += m_data.get_E(0, cell.get_node(0).get_id()).get_x() * cell.get_ddx_lamb0();
+		divE += m_data.get_E(0, cell.get_node(0).get_id()).get_y() * cell.get_ddy_lamb0();
+		divE += m_data.get_E(0, cell.get_node(0).get_id()).get_z() * cell.get_ddz_lamb0();
+
+		divE += m_data.get_E(0, cell.get_node(1).get_id()).get_x() * cell.get_ddx_lamb1();
+		divE += m_data.get_E(0, cell.get_node(1).get_id()).get_y() * cell.get_ddy_lamb1();
+		divE += m_data.get_E(0, cell.get_node(1).get_id()).get_z() * cell.get_ddz_lamb1();
+
+		divE += m_data.get_E(0, cell.get_node(2).get_id()).get_x() * cell.get_ddx_lamb2();
+		divE += m_data.get_E(0, cell.get_node(2).get_id()).get_y() * cell.get_ddy_lamb2();
+		divE += m_data.get_E(0, cell.get_node(2).get_id()).get_z() * cell.get_ddz_lamb2();
+
+		divE += m_data.get_E(0, cell.get_node(3).get_id()).get_x() * cell.get_ddx_lamb3();
+		divE += m_data.get_E(0, cell.get_node(3).get_id()).get_y() * cell.get_ddy_lamb3();
+		divE += m_data.get_E(0, cell.get_node(3).get_id()).get_z() * cell.get_ddz_lamb3();
+
+
+		divB += m_data.get_B(0, cell.get_node(0).get_id()).get_x() * cell.get_ddx_lamb0();
+		divB += m_data.get_B(0, cell.get_node(0).get_id()).get_y() * cell.get_ddy_lamb0();
+		divB += m_data.get_B(0, cell.get_node(0).get_id()).get_z() * cell.get_ddz_lamb0();
+
+		divB += m_data.get_B(0, cell.get_node(1).get_id()).get_x() * cell.get_ddx_lamb1();
+		divB += m_data.get_B(0, cell.get_node(1).get_id()).get_y() * cell.get_ddy_lamb1();
+		divB += m_data.get_B(0, cell.get_node(1).get_id()).get_z() * cell.get_ddz_lamb1();
+
+		divB += m_data.get_B(0, cell.get_node(2).get_id()).get_x() * cell.get_ddx_lamb2();
+		divB += m_data.get_B(0, cell.get_node(2).get_id()).get_y() * cell.get_ddy_lamb2();
+		divB += m_data.get_B(0, cell.get_node(2).get_id()).get_z() * cell.get_ddz_lamb2();
+
+		divB += m_data.get_B(0, cell.get_node(3).get_id()).get_x() * cell.get_ddx_lamb3();
+		divB += m_data.get_B(0, cell.get_node(3).get_id()).get_y() * cell.get_ddy_lamb3();
+		divB += m_data.get_B(0, cell.get_node(3).get_id()).get_z() * cell.get_ddz_lamb3();
+
+		if (divE != m_data.get_rho(0, c)/m_eps && divB != 0.)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void UnsteadyMaxwellKernel::build_matrix_A()
@@ -35,7 +85,8 @@ void UnsteadyMaxwellKernel::build_matrix_A()
 	std::vector<size_t> cells_id;
 	size_t nb_cells;
 
-	Cell cell;
+	Cell cell(m_mesh.get_cell(0));
+	Node N0, N1, N2, N3;
 	size_t S0, S1, S2, S3;
 	
 	for (size_t n = 0; n < m_nb_nodes; n++)
@@ -58,10 +109,15 @@ void UnsteadyMaxwellKernel::build_matrix_A()
 			for (size_t c = 0; c < nb_cells; c++)
 			{
 				cell = m_mesh.get_cell(cells_id[c]);
-				S0 = cell.get_node_id(0);
-				S1 = cell.get_node_id(1);
-				S2 = cell.get_node_id(2);
-				S3 = cell.get_node_id(3);
+				N0 = cell.get_node(0);
+				N1 = cell.get_node(1);
+				N2 = cell.get_node(2);
+				N3 = cell.get_node(3);
+				
+				S0 = N0.get_id();
+				S1 = N1.get_id();
+				S2 = N2.get_id();
+				S3 = N3.get_id();
 				
 				//finite difference term
 				for (size_t i = 0; i < 6; i++) //common part to all 6 equations
@@ -153,6 +209,7 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 	size_t nb_cells;
 
 	Cell cell;
+	Node N0, N1, N2, N3;
 	size_t S0, S1, S2, S3;
 
 	Vec3D E0, E1, E2, E3;
@@ -162,8 +219,8 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 	{
 		if (boundary_node(n))
 		{
-			E0 = m_data.get_boudary_condition_E(n);
-			B0 = m_data.get_boudary_condition_B(n);
+			E0 = m_data.get_boundary_condition_E(n);
+			B0 = m_data.get_boundary_condition_B(n);
 
 			vec_B[6*n] = E0.get_x();
 			vec_B[6*n+1] = E0.get_y();
@@ -181,10 +238,15 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 			for (size_t c = 0; c < nb_cells; c++)
 			{
 				cell = m_mesh.get_cell(cells_id[c]);
-				S0 = cell.get_node_id(0);
-				S1 = cell.get_node_id(1);
-				S2 = cell.get_node_id(2);
-				S3 = cell.get_node_id(3);
+				N0 = cell.get_node(0);
+				N1 = cell.get_node(1);
+				N2 = cell.get_node(2);
+				N3 = cell.get_node(3);
+
+				S0 = N0.get_id();
+				S1 = N1.get_id();
+				S2 = N2.get_id();
+				S3 = N3.get_id();
 
 				E0 = m_data.get_E(t, S0);
 				E1 = m_data.get_E(t, S1);
@@ -342,12 +404,12 @@ void UnsteadyMaxwellKernel::simulate()
 {
 	if (!check_divergence_in_ID())
 	{
-		throw std::incvalid_argument("Iinitial data must be solution of Maxwell-Gauss and Maxwell-Thompson equations");
+		throw std::invalid_argument("Iinitial data must be solution of Maxwell-Gauss and Maxwell-Thompson equations");
 	}
 
-	if (!check_ID_BC_compatibility())
+	if (!m_data.check_ID_BC_compatibility())
 	{
-		throw std::incvalid_argument("Initial data must respect the boundary conditions");
+		throw std::invalid_argument("Initial data must respect the boundary conditions");
 	}
 
 	build_matrix_A();
@@ -364,7 +426,7 @@ void UnsteadyMaxwellKernel::simulate()
 			mean_energy_diff = GS_iteration();
 			k += 1;
 		}
-		while (mean_energy_diff > m_accuracy && k < m_max_nb_iterations)
+		while (mean_energy_diff > m_accuracy && k < m_max_nb_iterations);
 
 		if (k == m_max_nb_iterations)
 		{

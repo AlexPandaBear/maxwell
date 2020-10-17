@@ -2,13 +2,19 @@
 
 Node::Node() {}
 
-Node::Node(double x, double y, double z, bool boundary) :
+Node::Node(size_t id, double x, double y, double z, bool boundary) :
+	m_id(id),
 	m_x(x),
 	m_y(y),
 	m_z(z),
 	m_boundary(boundary) {}
 
 Node::~Node() {}
+
+size_t Node::get_id() const
+{
+	return m_id;
+}
 
 double Node::get_x() const
 {

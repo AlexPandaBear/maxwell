@@ -20,4 +20,7 @@ public:
 	void set_y(double y);
 	void set_z(double z);
 	void set(double x, double y, double z);
+
+	bool operator==(Vec3D const& v);
+	bool operator!=(Vec3D const& v);
 };

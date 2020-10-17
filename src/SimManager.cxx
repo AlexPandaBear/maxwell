@@ -24,8 +24,14 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	m_data.erase_BCs();
 }
 
-void SimManager::define_initial_state(std::vector<Vec3D> E0, std::vector<Vec3D> B0)
+void SimManager::define_initial_state(std::vector<double> rho0, std::vector<Vec3D> j0, std::vector<Vec3D> E0, std::vector<Vec3D> B0)
 {
+	for (size_t c = 0; c < m_data.get_nb_cells(); c++)
+	{
+		m_data.set_rho(0, c, rho0[c]);
+		m_data.set_j(0, c, j0[c]);
+	}
+
 	for (size_t n = 0; n < m_data.get_nb_nodes(); n++)
 	{
 		m_data.set_E(0, n, E0[n]);

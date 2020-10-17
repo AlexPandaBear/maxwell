@@ -45,3 +45,18 @@ void Vec3D::set(double x, double y, double z)
 	m_y = y;
 	m_z = z;
 }
+
+bool Vec3D::operator==(Vec3D const& v)
+	{
+		if (v.get_x() != m_x || v.get_y() != m_y || v.get_z() != m_z)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+bool Vec3D::operator!=(Vec3D const& v)
+{
+	return !(*this == v);
+}
