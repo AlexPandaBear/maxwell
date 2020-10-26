@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include <list>
+#include <iostream>
 #include <string>
 #include "Field.hxx"
 #include "Vec3D.hxx"

@@ -57,13 +57,10 @@ void DataKeeper::reset_dimensions(size_t nb_steps, size_t nb_nodes, size_t nb_ce
 	m_nb_nodes = nb_nodes;
 	m_nb_cells = nb_cells;
 
-	for (size_t t = 0; t < nb_steps+1; t++)
-	{
-		m_rho[t].reset_nb_nodes(nb_cells);
-		m_j[t].reset_nb_nodes(nb_cells);
-		m_E[t].reset_nb_nodes(nb_nodes);
-		m_B[t].reset_nb_nodes(nb_nodes);
-	}
+	m_rho = std::vector<Field<double>>(nb_steps+1, Field<double>(nb_cells));
+	m_j = std::vector<Field<Vec3D>>(nb_steps+1, Field<Vec3D>(nb_cells));
+	m_E = std::vector<Field<Vec3D>>(nb_steps+1, Field<Vec3D>(nb_nodes));
+	m_B = std::vector<Field<Vec3D>>(nb_steps+1, Field<Vec3D>(nb_nodes));
 
 	erase_BCs();
 }

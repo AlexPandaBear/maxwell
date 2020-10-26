@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <iostream>
+#include "Vec3D.hxx"
 
 class Node
 {
@@ -24,8 +26,12 @@ public:
 	double get_z() const;
 	bool get_boudary() const;
 
+	Vec3D get_xyz() const;
+
 	void set_x(double x);
 	void set_y(double y);
 	void set_z(double z);
 	void set_boundary(bool boundary);
+
+	void display() const;
 };

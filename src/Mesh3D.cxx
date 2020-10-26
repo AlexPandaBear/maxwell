@@ -16,23 +16,29 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	double dz((z_max-z_min)/(nz-1));
 
 	m_nodes = std::vector<Node>();
+	size_t id(0);
 
+	Node n;
 	for (size_t i = 0; i < nx; i++)
 	{
 		for (size_t j = 0; j < ny; j++)
 		{
 			for (size_t k = 0; k < nz; k++)
 			{
-				m_nodes.push_back(Node(i*ny*nz + j*nz + k, x_min+i*dx, y_min+j*dy, z_min+k*dz));
+				n = Node(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
+				n.display();
+				m_nodes.push_back(n);
+				id++;
 			}
 		}
 	}
+
 
 	m_cells = std::vector<Cell>();
 
 	for (size_t i = 0; i < nx-1; i++)
 	{
-		for (size_t j = 0; i < ny-1; j++)
+		for (size_t j = 0; j < ny-1; j++)
 		{
 			for (size_t k = 0; k < nz-1; k++)
 			{
@@ -46,14 +52,29 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	}
 }
 
+size_t Mesh3D::get_nb_nodes() const
+{
+	return m_nb_nodes;
+}
+
+size_t Mesh3D::get_nb_cells() const
+{
+	return m_nb_cells;
+}
+
 Node Mesh3D::get_node(size_t node_nb) const
 {
 	return m_nodes[node_nb];
 }
 
-Cell Mesh3D::get_cell(size_t cell_nb) const
+Cell const& Mesh3D::get_cell(size_t cell_nb) const
 {
 	return m_cells[cell_nb];
+}
+
+const Cell* Mesh3D::get_cell_ptr(size_t cell_nb) const
+{
+	return &m_cells[cell_nb];
 }
 
 std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_nb) const
@@ -72,3 +93,8 @@ std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_nb) const
 }
 
 void Mesh3D::save(std::string file) const {} //TODO
+
+Vec3D Mesh3D::get_node_xyz(size_t node_nb) const
+{
+	return get_node(node_nb).get_xyz();
+}

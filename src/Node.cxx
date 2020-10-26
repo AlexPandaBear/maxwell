@@ -36,6 +36,11 @@ bool Node::get_boudary() const
 	return m_boundary;
 }
 
+Vec3D Node::get_xyz() const
+{
+	return Vec3D(m_x, m_y, m_z);
+}
+
 void Node::set_x(double x)
 {
 	m_x = x;
@@ -54,4 +59,9 @@ void Node::set_z(double z)
 void Node::set_boundary(bool boundary)
 {
 	m_boundary = boundary;
+}
+
+void Node::display() const
+{
+	std::cout << "Node #" << m_id << ": x = " << m_x << " | y = " << m_y << " | z = " << m_z << " | boundary = " << m_boundary << std::endl;
 }

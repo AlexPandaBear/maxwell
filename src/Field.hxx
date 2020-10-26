@@ -10,7 +10,9 @@ private:
 	std::vector<T> m_values;
 
 public:
-	Field() {}
+	Field(size_t nb_nodes) :
+		m_nb_nodes(nb_nodes),
+		m_values(std::vector<T>(nb_nodes)) {}
 
 	~Field() {}
 

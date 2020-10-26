@@ -170,6 +170,14 @@ double Cell::get_ddz_lamb3() const
 	return m_ddz_lamb3;
 }
 
+void Cell::display() const
+{
+	m_N0.display();
+	m_N1.display();
+	m_N2.display();
+	m_N3.display();
+}
+
 Cell Cell::operator=(Cell const& cell)
 {
 	Cell copy(cell);

@@ -43,6 +43,8 @@ public:
 	double get_ddz_lamb1() const;
 	double get_ddz_lamb2() const;
 	double get_ddz_lamb3() const;
+
+	void display() const;
 	
 	Cell operator=(Cell const& cell);
 };

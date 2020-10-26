@@ -208,7 +208,7 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 	std::vector<size_t> cells_id;
 	size_t nb_cells;
 
-	Cell cell;
+	const Cell* ptr_cell;
 	Node N0, N1, N2, N3;
 	size_t S0, S1, S2, S3;
 
@@ -237,17 +237,22 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 
 			for (size_t c = 0; c < nb_cells; c++)
 			{
-				cell = m_mesh.get_cell(cells_id[c]);
-				N0 = cell.get_node(0);
-				N1 = cell.get_node(1);
-				N2 = cell.get_node(2);
-				N3 = cell.get_node(3);
+				std::cout << cells_id[c] << std::endl;
+				ptr_cell = m_mesh.get_cell_ptr(cells_id[c]);
+				ptr_cell->display();
+
+				N0 = ptr_cell->get_node(0);
+				N1 = ptr_cell->get_node(1);
+				N2 = ptr_cell->get_node(2);
+				N3 = ptr_cell->get_node(3);
 
 				S0 = N0.get_id();
 				S1 = N1.get_id();
 				S2 = N2.get_id();
 				S3 = N3.get_id();
 
+				N0.display();
+				std::cout << "coucou " << t << " " << S0 << std::endl;
 				E0 = m_data.get_E(t, S0);
 				E1 = m_data.get_E(t, S1);
 				E2 = m_data.get_E(t, S2);
@@ -293,70 +298,70 @@ void UnsteadyMaxwellKernel::build_vector_B(size_t t)
 
 				//rotB term
 				//Ex equation
-				vec_B[6*n] += coef_E*cell.get_ddy_lamb0()*B0.get_z();
-				vec_B[6*n] += coef_E*cell.get_ddy_lamb1()*B1.get_z();
-				vec_B[6*n] += coef_E*cell.get_ddy_lamb2()*B2.get_z();
-				vec_B[6*n] += coef_E*cell.get_ddy_lamb3()*B3.get_z();
+				vec_B[6*n] += coef_E*ptr_cell->get_ddy_lamb0()*B0.get_z();
+				vec_B[6*n] += coef_E*ptr_cell->get_ddy_lamb1()*B1.get_z();
+				vec_B[6*n] += coef_E*ptr_cell->get_ddy_lamb2()*B2.get_z();
+				vec_B[6*n] += coef_E*ptr_cell->get_ddy_lamb3()*B3.get_z();
 
-				vec_B[6*n] -= coef_E*cell.get_ddz_lamb0()*B0.get_y();
-				vec_B[6*n] -= coef_E*cell.get_ddz_lamb1()*B1.get_y();
-				vec_B[6*n] -= coef_E*cell.get_ddz_lamb2()*B2.get_y();
-				vec_B[6*n] -= coef_E*cell.get_ddz_lamb3()*B3.get_y();
+				vec_B[6*n] -= coef_E*ptr_cell->get_ddz_lamb0()*B0.get_y();
+				vec_B[6*n] -= coef_E*ptr_cell->get_ddz_lamb1()*B1.get_y();
+				vec_B[6*n] -= coef_E*ptr_cell->get_ddz_lamb2()*B2.get_y();
+				vec_B[6*n] -= coef_E*ptr_cell->get_ddz_lamb3()*B3.get_y();
 
 				//Ey equation
-				vec_B[6*n+1] += coef_E*cell.get_ddz_lamb0()*B0.get_x();
-				vec_B[6*n+1] += coef_E*cell.get_ddz_lamb1()*B1.get_x();
-				vec_B[6*n+1] += coef_E*cell.get_ddz_lamb2()*B2.get_x();
-				vec_B[6*n+1] += coef_E*cell.get_ddz_lamb3()*B3.get_x();
+				vec_B[6*n+1] += coef_E*ptr_cell->get_ddz_lamb0()*B0.get_x();
+				vec_B[6*n+1] += coef_E*ptr_cell->get_ddz_lamb1()*B1.get_x();
+				vec_B[6*n+1] += coef_E*ptr_cell->get_ddz_lamb2()*B2.get_x();
+				vec_B[6*n+1] += coef_E*ptr_cell->get_ddz_lamb3()*B3.get_x();
 
-				vec_B[6*n+1] -= coef_E*cell.get_ddx_lamb0()*B0.get_z();
-				vec_B[6*n+1] -= coef_E*cell.get_ddx_lamb1()*B1.get_z();
-				vec_B[6*n+1] -= coef_E*cell.get_ddx_lamb2()*B2.get_z();
-				vec_B[6*n+1] -= coef_E*cell.get_ddx_lamb3()*B3.get_z();
+				vec_B[6*n+1] -= coef_E*ptr_cell->get_ddx_lamb0()*B0.get_z();
+				vec_B[6*n+1] -= coef_E*ptr_cell->get_ddx_lamb1()*B1.get_z();
+				vec_B[6*n+1] -= coef_E*ptr_cell->get_ddx_lamb2()*B2.get_z();
+				vec_B[6*n+1] -= coef_E*ptr_cell->get_ddx_lamb3()*B3.get_z();
 
 				//Ez equation
-				vec_B[6*n+2] += coef_E*cell.get_ddx_lamb0()*B0.get_y();
-				vec_B[6*n+2] += coef_E*cell.get_ddx_lamb1()*B1.get_y();
-				vec_B[6*n+2] += coef_E*cell.get_ddx_lamb2()*B2.get_y();
-				vec_B[6*n+2] += coef_E*cell.get_ddx_lamb3()*B3.get_y();
+				vec_B[6*n+2] += coef_E*ptr_cell->get_ddx_lamb0()*B0.get_y();
+				vec_B[6*n+2] += coef_E*ptr_cell->get_ddx_lamb1()*B1.get_y();
+				vec_B[6*n+2] += coef_E*ptr_cell->get_ddx_lamb2()*B2.get_y();
+				vec_B[6*n+2] += coef_E*ptr_cell->get_ddx_lamb3()*B3.get_y();
 
-				vec_B[6*n+2] -= coef_E*cell.get_ddy_lamb0()*B0.get_x();
-				vec_B[6*n+2] -= coef_E*cell.get_ddy_lamb1()*B1.get_x();
-				vec_B[6*n+2] -= coef_E*cell.get_ddy_lamb2()*B2.get_x();
-				vec_B[6*n+2] -= coef_E*cell.get_ddy_lamb3()*B3.get_x();
+				vec_B[6*n+2] -= coef_E*ptr_cell->get_ddy_lamb0()*B0.get_x();
+				vec_B[6*n+2] -= coef_E*ptr_cell->get_ddy_lamb1()*B1.get_x();
+				vec_B[6*n+2] -= coef_E*ptr_cell->get_ddy_lamb2()*B2.get_x();
+				vec_B[6*n+2] -= coef_E*ptr_cell->get_ddy_lamb3()*B3.get_x();
 
 				//Bx equation
-				vec_B[6*n+3] -= coef_B*cell.get_ddy_lamb0()*E0.get_z();
-				vec_B[6*n+3] -= coef_B*cell.get_ddy_lamb1()*E1.get_z();
-				vec_B[6*n+3] -= coef_B*cell.get_ddy_lamb2()*E2.get_z();
-				vec_B[6*n+3] -= coef_B*cell.get_ddy_lamb3()*E3.get_z();
+				vec_B[6*n+3] -= coef_B*ptr_cell->get_ddy_lamb0()*E0.get_z();
+				vec_B[6*n+3] -= coef_B*ptr_cell->get_ddy_lamb1()*E1.get_z();
+				vec_B[6*n+3] -= coef_B*ptr_cell->get_ddy_lamb2()*E2.get_z();
+				vec_B[6*n+3] -= coef_B*ptr_cell->get_ddy_lamb3()*E3.get_z();
 
-				vec_B[6*n+3] += coef_B*cell.get_ddz_lamb0()*E0.get_y();
-				vec_B[6*n+3] += coef_B*cell.get_ddz_lamb1()*E1.get_y();
-				vec_B[6*n+3] += coef_B*cell.get_ddz_lamb2()*E2.get_y();
-				vec_B[6*n+3] += coef_B*cell.get_ddz_lamb3()*E3.get_y();
+				vec_B[6*n+3] += coef_B*ptr_cell->get_ddz_lamb0()*E0.get_y();
+				vec_B[6*n+3] += coef_B*ptr_cell->get_ddz_lamb1()*E1.get_y();
+				vec_B[6*n+3] += coef_B*ptr_cell->get_ddz_lamb2()*E2.get_y();
+				vec_B[6*n+3] += coef_B*ptr_cell->get_ddz_lamb3()*E3.get_y();
 
 				//By equation
-				vec_B[6*n+4] -= coef_B*cell.get_ddz_lamb0()*E0.get_x();
-				vec_B[6*n+4] -= coef_B*cell.get_ddz_lamb1()*E1.get_x();
-				vec_B[6*n+4] -= coef_B*cell.get_ddz_lamb2()*E2.get_x();
-				vec_B[6*n+4] -= coef_B*cell.get_ddz_lamb3()*E3.get_x();
+				vec_B[6*n+4] -= coef_B*ptr_cell->get_ddz_lamb0()*E0.get_x();
+				vec_B[6*n+4] -= coef_B*ptr_cell->get_ddz_lamb1()*E1.get_x();
+				vec_B[6*n+4] -= coef_B*ptr_cell->get_ddz_lamb2()*E2.get_x();
+				vec_B[6*n+4] -= coef_B*ptr_cell->get_ddz_lamb3()*E3.get_x();
 
-				vec_B[6*n+4] += coef_B*cell.get_ddx_lamb0()*E0.get_z();
-				vec_B[6*n+4] += coef_B*cell.get_ddx_lamb1()*E1.get_z();
-				vec_B[6*n+4] += coef_B*cell.get_ddx_lamb2()*E2.get_z();
-				vec_B[6*n+4] += coef_B*cell.get_ddx_lamb3()*E3.get_z();
+				vec_B[6*n+4] += coef_B*ptr_cell->get_ddx_lamb0()*E0.get_z();
+				vec_B[6*n+4] += coef_B*ptr_cell->get_ddx_lamb1()*E1.get_z();
+				vec_B[6*n+4] += coef_B*ptr_cell->get_ddx_lamb2()*E2.get_z();
+				vec_B[6*n+4] += coef_B*ptr_cell->get_ddx_lamb3()*E3.get_z();
 
 				//Bz equation
-				vec_B[6*n+5] -= coef_B*cell.get_ddx_lamb0()*E0.get_y();
-				vec_B[6*n+5] -= coef_B*cell.get_ddx_lamb1()*E1.get_y();
-				vec_B[6*n+5] -= coef_B*cell.get_ddx_lamb2()*E2.get_y();
-				vec_B[6*n+5] -= coef_B*cell.get_ddx_lamb3()*E3.get_y();
+				vec_B[6*n+5] -= coef_B*ptr_cell->get_ddx_lamb0()*E0.get_y();
+				vec_B[6*n+5] -= coef_B*ptr_cell->get_ddx_lamb1()*E1.get_y();
+				vec_B[6*n+5] -= coef_B*ptr_cell->get_ddx_lamb2()*E2.get_y();
+				vec_B[6*n+5] -= coef_B*ptr_cell->get_ddx_lamb3()*E3.get_y();
 
-				vec_B[6*n+5] += coef_B*cell.get_ddy_lamb0()*E0.get_x();
-				vec_B[6*n+5] += coef_B*cell.get_ddy_lamb1()*E1.get_x();
-				vec_B[6*n+5] += coef_B*cell.get_ddy_lamb2()*E2.get_x();
-				vec_B[6*n+5] += coef_B*cell.get_ddy_lamb3()*E3.get_x();
+				vec_B[6*n+5] += coef_B*ptr_cell->get_ddy_lamb0()*E0.get_x();
+				vec_B[6*n+5] += coef_B*ptr_cell->get_ddy_lamb1()*E1.get_x();
+				vec_B[6*n+5] += coef_B*ptr_cell->get_ddy_lamb2()*E2.get_x();
+				vec_B[6*n+5] += coef_B*ptr_cell->get_ddy_lamb3()*E3.get_x();
 			}
 		}
 	}
@@ -404,7 +409,7 @@ void UnsteadyMaxwellKernel::simulate()
 {
 	if (!check_divergence_in_ID())
 	{
-		throw std::invalid_argument("Iinitial data must be solution of Maxwell-Gauss and Maxwell-Thompson equations");
+		throw std::invalid_argument("Initial data is not solution of Maxwell-Gauss and Maxwell-Thompson equations");
 	}
 
 	if (!m_data.check_ID_BC_compatibility())
