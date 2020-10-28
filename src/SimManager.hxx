@@ -1,12 +1,14 @@
 #pragma once
 
 #include "UnsteadyMaxwellKernel.hxx"
+#include "DataProcessor.hxx"
 
 class SimManager
 {
 private:
 	Mesh3D m_mesh;
 	DataKeeper m_data;
+	DataProcessor m_processor;
 
 	double generate_random_double(double min, double max) const;
 	double compute_distance_to_axis(Vec3D pt, Vec3D axis_pt_A, Vec3D axis_pt_B) const;
@@ -14,7 +16,7 @@ private:
 
 public:
 	SimManager();
-	SimManager(std::string simulation_name);
+	//SimManager(std::string simulation_name);
 	~SimManager();
 
 	void set_constants(double epsilon, double mu);
@@ -25,5 +27,8 @@ public:
 
 	void simulate();
 
-	void save(std::string simulation_name) const;
+	//void save(std::string simulation_name) const;
+
+	Field<Vec3D> get_mesh();
+	UnsteadyField<double> const& get_energy_density();
 };

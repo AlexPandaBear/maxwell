@@ -5,7 +5,7 @@
 #include <list>
 #include <iostream>
 #include <string>
-#include "Field.hxx"
+#include "UnsteadyField.hxx"
 #include "Vec3D.hxx"
 #include "BoundaryCondition.hxx"
 
@@ -23,15 +23,15 @@ private:
 	size_t m_nb_nodes;
 	size_t m_nb_cells;
 
-	std::vector<Field<double>> m_rho;
-	std::vector<Field<Vec3D>> m_j;
-	std::vector<Field<Vec3D>> m_E, m_B;
+	UnsteadyField<double> m_rho;
+	UnsteadyField<Vec3D> m_j;
+	UnsteadyField<Vec3D> m_E, m_B;
 
 	std::vector<BoundaryCondition> m_BC;
 
 public:
 	DataKeeper();
-	DataKeeper(std::string file);
+	//DataKeeper(std::string file);
 	~DataKeeper();
 
 	double get_epsilon() const;
@@ -75,5 +75,5 @@ public:
 
 	bool check_ID_BC_compatibility() const;
 
-	void save(std::string file) const;
+	//void save(std::string file) const;
 };

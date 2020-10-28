@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Node.hxx"
 #include "Cell.hxx"
+#include "Field.hxx"
 
 class Mesh3D
 {
@@ -34,4 +35,5 @@ public:
 	void save(std::string file) const;
 
 	Vec3D get_node_xyz(size_t node_nb) const;
+	Field<Vec3D> get_all_nodes_xyz() const;
 };

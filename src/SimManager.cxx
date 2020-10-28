@@ -1,11 +1,15 @@
 #include "SimManager.hxx"
 
-SimManager::SimManager() {}
-
+SimManager::SimManager() :
+	m_mesh(Mesh3D()),
+	m_data(DataKeeper()),
+	m_processor(DataProcessor(m_data)) {}
+/*
 SimManager::SimManager(std::string simulation_name) :
 	m_mesh(Mesh3D(simulation_name + ".m")),
-	m_data(DataKeeper(simulation_name + ".d")) {}
-
+	m_data(DataKeeper(simulation_name + ".d")),
+	m_processor(DataProcessor(simulation_name + ".p")) {}
+*/
 SimManager::~SimManager() {}
 
 void SimManager::set_constants(double epsilon, double mu)
@@ -114,9 +118,19 @@ void SimManager::simulate()
 	UnsteadyMaxwellKernel kernel(m_mesh, m_data);
 	kernel.simulate();
 }
-
+/*
 void SimManager::save(std::string simulation_name) const
 {
 	m_mesh.save(simulation_name + ".m");
 	m_data.save(simulation_name + ".d");
+}
+*/
+Field<Vec3D> SimManager::get_mesh()
+{
+	return m_mesh.get_all_nodes_xyz();
+}
+
+UnsteadyField<double> const& SimManager::get_energy_density()
+{
+	return m_processor.get_energy_density();
 }

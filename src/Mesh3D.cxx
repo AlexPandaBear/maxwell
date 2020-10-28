@@ -98,3 +98,15 @@ Vec3D Mesh3D::get_node_xyz(size_t node_nb) const
 {
 	return get_node(node_nb).get_xyz();
 }
+
+Field<Vec3D> Mesh3D::get_all_nodes_xyz() const
+{
+	Field<Vec3D> f(m_nb_nodes);
+
+	for (size_t n = 0; n < m_nb_nodes; n++)
+	{
+		f.set_value(n, get_node(n).get_xyz());
+	}
+
+	return f;
+}

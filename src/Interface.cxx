@@ -2,16 +2,18 @@
 <%
 setup_pybind11(cfg)
 cfg['compiler_args'] = ['-std=c++11', '-I/usr/local/lib/python3.7/dist-packages/pybind11-2.4.3-py3.7.egg/']
-cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'SparseMatrix.hxx', 'Mesh3D.hxx', 'BoundaryCondition.hxx', 'Cell.hxx', 'Node.hxx', 'DataKeeper.hxx', 'Field.hxx', 'Vec3D.hxx']
-cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'SparseMatrix.cxx', 'Mesh3D.cxx', 'BoundaryCondition.cxx', 'Cell.cxx', 'Node.cxx', 'DataKeeper.cxx', 'Vec3D.cxx']
+cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'SparseMatrix.hxx', 'Mesh3D.hxx', 'BoundaryCondition.hxx', 'Cell.hxx', 'Node.hxx', 'DataKeeper.hxx', 'DataProcessor.hxx', 'UnsteadyField.hxx', 'Vec3D.hxx']
+cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'SparseMatrix.cxx', 'Mesh3D.cxx', 'BoundaryCondition.cxx', 'Cell.cxx', 'Node.cxx', 'DataKeeper.cxx', 'DataProcessor.cxx', 'Vec3D.cxx']
 %>
 */
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <typeinfo>
 #include "SimManager.hxx"
 #include "Vec3D.hxx"
+#include "UnsteadyField.hxx"
 
 namespace py = pybind11;
 
@@ -51,8 +53,10 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("E"),
 			py::arg("B"))
 		.def("simulate", &SimManager::simulate)
-		.def("save", &SimManager::save,
-			py::arg("simulation_name"));
+		//.def("save", &SimManager::save,
+		//	py::arg("simulation_name"))
+		.def("getMesh", &SimManager::get_mesh)
+		.def("getEnergyDensity", &SimManager::get_energy_density);
 
 	py::class_<Vec3D>(m, "Vec3D")
 		.def(py::init<>())
@@ -69,4 +73,56 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("y"))
 		.def("setZ", &Vec3D::set_z,
 			py::arg("z"));
+
+	py::class_<Field<double>>(m, "ScalarField", py::buffer_protocol())
+		.def_buffer([](Field<double>& f) -> py::buffer_info
+			{
+				return py::buffer_info(
+						f.get_ptr(),
+						sizeof(double),
+						py::format_descriptor<double>::format(),
+						1,
+						{f.get_nb_nodes()},
+						{sizeof(double)}
+					);
+			});
+
+	py::class_<Field<Vec3D>>(m, "VectorField", py::buffer_protocol())
+		.def_buffer([](Field<Vec3D>& f) -> py::buffer_info
+			{
+				return py::buffer_info(
+						f.get_ptr(),
+						sizeof(Vec3D),
+						py::format_descriptor<Vec3D>::format(),
+						1,
+						{f.get_nb_nodes()},
+						{sizeof(Vec3D)}
+					);
+			});
+
+	py::class_<UnsteadyField<double>>(m, "UnsteadyScalarField", py::buffer_protocol())
+		.def_buffer([](UnsteadyField<double>& f) -> py::buffer_info
+			{
+				return py::buffer_info(
+						f.get_ptr(),
+						sizeof(double),
+						py::format_descriptor<double>::format(),
+						2,
+						{f.get_nb_steps()+1, f.get_nb_nodes()},
+						{sizeof(double)*f.get_nb_nodes(), sizeof(double)}
+					);
+			});
+
+	py::class_<UnsteadyField<Vec3D>>(m, "UnsteadyVectorField", py::buffer_protocol())
+		.def_buffer([](UnsteadyField<double>& f) -> py::buffer_info
+			{
+				return py::buffer_info(
+						f.get_ptr(),
+						sizeof(Vec3D),
+						py::format_descriptor<Vec3D>::format(),
+						2,
+						{f.get_nb_steps()+1, f.get_nb_nodes()},
+						{sizeof(Vec3D)*f.get_nb_nodes(), sizeof(Vec3D)}
+					);
+			});
 }

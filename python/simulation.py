@@ -52,18 +52,18 @@ S.simulate()
 
 
 
-M = S.getMesh()
-E = S.getEnergyDensity()
+M = np.asarray(S.getMesh())
+E = np.asarray(S.getEnergyDensity())
 
 
 
 #%% ENERGY PLOT
 
 def update_energy_plot(frame_number, mesh, energy_field, ax):
-    ax.cla()
-    for node in mesh:
-    	c = ...
-	    ax.scatter(node.get_x(), node.get_y(), node.get_z(), color=c)
+	ax.cla()
+	for node in mesh:
+		c = 'b'
+		ax.scatter(node.get_x(), node.get_y(), node.get_z(), color=c)
 
 print("Plotting energy density field...")
 fig = plt.figure()

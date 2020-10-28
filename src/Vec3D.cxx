@@ -1,6 +1,9 @@
 #include "Vec3D.hxx"
 
-Vec3D::Vec3D() {}
+Vec3D::Vec3D() :
+	m_x(0.),
+	m_y(0.),
+	m_z(0.) {}
 
 Vec3D::Vec3D(double x, double y, double z) :
 	m_x(x),
