@@ -10,7 +10,7 @@ private:
 	DataKeeper& m_data;
 
 	bool m_energy_ready;
-	UnsteadyField<double> m_energy;
+	std::vector<ScalarField> m_energy;
 
 	void compute_energy();
 	void compute_all();
@@ -19,5 +19,5 @@ public:
 	DataProcessor(DataKeeper& data);
 	~DataProcessor();
 
-	UnsteadyField<double> const& get_energy_density();
+	ScalarField const& get_energy_density(size_t step);
 };

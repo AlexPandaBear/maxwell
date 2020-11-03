@@ -10,11 +10,11 @@ DataKeeper::DataKeeper() :
 	m_max_nb_iterations(0),
 	m_nb_nodes(0),
 	m_nb_cells(0),
-	m_rho(UnsteadyField<double>(0, 0)),
-	m_j(UnsteadyField<Vec3D>(0, 0)),
-	m_E(UnsteadyField<Vec3D>(0, 0)),
-	m_B(UnsteadyField<Vec3D>(0, 0)),
-	m_BC(std::vector<BoundaryCondition>()) {}
+	m_rho(std::vector<ScalarField>(0, ScalarField(0))),
+	m_j(std::vector<VectorField>(0, VectorField(0))),
+	m_E(std::vector<VectorField>(0, VectorField(0))),
+	m_B(std::vector<VectorField>(0, VectorField(0))),
+	m_BC(std::vector<size_t>()) {}
 
 //DataKeeper::DataKeeper(std::string file) {} //TODO
 
@@ -71,10 +71,10 @@ void DataKeeper::reset_dimensions(size_t nb_steps, size_t nb_nodes, size_t nb_ce
 	m_nb_nodes = nb_nodes;
 	m_nb_cells = nb_cells;
 
-	m_rho.reset_size(nb_steps+1, nb_cells);
-	m_j.reset_size(nb_steps+1, nb_cells);
-	m_E.reset_size(nb_steps+1, nb_nodes);
-	m_B.reset_size(nb_steps+1, nb_nodes);
+	m_rho = std::vector<ScalarField>(nb_steps+1, ScalarField(nb_cells));
+	m_j = std::vector<VectorField>(nb_steps+1, VectorField(nb_cells));
+	m_E = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
+	m_B = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
 
 	erase_BCs();
 }
@@ -111,74 +111,74 @@ void DataKeeper::set_max_nb_iterations(size_t max_nb_iterations)
 
 double DataKeeper::get_rho(size_t t, size_t node_nb) const
 {
-	return m_rho.get_value(t, node_nb);
+	return m_rho[t].get_value(node_nb);
 }
 
 void DataKeeper::set_rho(size_t t, size_t node_nb, double rho)
 {
-	m_rho.set_value(t, node_nb, rho);
+	m_rho[t].set_value(node_nb, rho);
 }
 
-Vec3D DataKeeper::get_j(size_t t, size_t node_nb) const
+Vec3D DataKeeper::get_j(size_t t, size_t node_nb)
 {
-	return m_j.get_value(t, node_nb);
+	return m_j[t].get_value(node_nb);
 }
 
 void DataKeeper::set_j(size_t t, size_t node_nb, Vec3D j)
 {
-	m_j.set_value(t, node_nb, j);
+	m_j[t].set_value(node_nb, j);
 }
 
-Vec3D DataKeeper::get_E(size_t t, size_t node_nb) const
+Vec3D DataKeeper::get_E(size_t t, size_t node_nb)
 {
-	return m_E.get_value(t, node_nb);
+	return m_E[t].get_value(node_nb);
 }
 
 void DataKeeper::set_E(size_t t, size_t node_nb, Vec3D E)
 {
-	m_E.set_value(t, node_nb, E);
+	m_E[t].set_value(node_nb, E);
 }
 
-Vec3D DataKeeper::get_B(size_t t, size_t node_nb) const
+Vec3D DataKeeper::get_B(size_t t, size_t node_nb)
 {
-	return m_B.get_value(t, node_nb);
+	return m_B[t].get_value(node_nb);
 }
 
 void DataKeeper::set_B(size_t t, size_t node_nb, Vec3D B)
 {
-	m_B.set_value(t, node_nb, B);
+	m_B[t].set_value(node_nb, B);
 }
 
 void DataKeeper::erase_BCs()
 {
-	m_BC = std::vector<BoundaryCondition>();
+	m_BC = std::vector<size_t>();
 }
 
-void DataKeeper::add_BC(size_t node_nb, Vec3D E, Vec3D B)
+void DataKeeper::add_BC(size_t node_nb)
 {
-	m_BC.push_back(BoundaryCondition(node_nb, E, B));
+	m_BC.push_back(node_nb);
 }
 
-Vec3D DataKeeper::get_boundary_condition_E(size_t node_nb) const
+Vec3D DataKeeper::get_boundary_condition_E(size_t node_nb)
 {
 	for (size_t i = 0; i < m_BC.size(); i++)
 	{
-		if (m_BC[i].get_node_nb() == node_nb)
+		if (m_BC[i] == node_nb)
 		{
-			return m_BC[i].get_E();
+			return m_E[0].get_value(node_nb);
 		}
 	}
 
 	throw std::invalid_argument("No boundary condition defined for node " + node_nb);
 }
 
-Vec3D DataKeeper::get_boundary_condition_B(size_t node_nb) const
+Vec3D DataKeeper::get_boundary_condition_B(size_t node_nb)
 {
 	for (size_t i = 0; i < m_BC.size(); i++)
 	{
-		if (m_BC[i].get_node_nb() == node_nb)
+		if (m_BC[i] == node_nb)
 		{
-			return m_BC[i].get_B();
+			return m_B[0].get_value(node_nb);
 		}
 	}
 
@@ -189,26 +189,13 @@ bool DataKeeper::boundary_node(size_t node_nb) const
 {
 	for (size_t i = 0; i < m_BC.size(); i++)
 	{
-		if (m_BC[i].get_node_nb() == node_nb)
+		if (m_BC[i] == node_nb)
 		{
 			return true;
 		}
 	}
 
 	return false;
-}
-
-bool DataKeeper::check_ID_BC_compatibility() const
-{
-	for (size_t n = 0; n < m_BC.size();n++)
-	{
-		if (m_E.get_value(0, n) != m_BC[n].get_E() || m_B.get_value(0, n) != m_BC[n].get_B())
-		{
-			return false;
-		}
-	}
-
-	return true;
 }
 
 //void DataKeeper::save(std::string file) const {} //TODO

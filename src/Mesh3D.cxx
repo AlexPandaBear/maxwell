@@ -1,8 +1,12 @@
 #include "Mesh3D.hxx"
 
-Mesh3D::Mesh3D() {}
+Mesh3D::Mesh3D() :
+	m_nb_nodes(0),
+	m_nb_cells(0),
+	m_nodes_xyz(VectorField(0)),
+	m_cells(0, Cell(m_nodes_xyz)) {}
 
-Mesh3D::Mesh3D(std::string file) {} //TODO
+//Mesh3D::Mesh3D(std::string file) {} //TODO
 
 Mesh3D::~Mesh3D() {}
 
@@ -15,26 +19,27 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	double dy((y_max-y_min)/(ny-1));
 	double dz((z_max-z_min)/(nz-1));
 
-	m_nodes = std::vector<Node>();
+
+	m_nodes_xyz = VectorField(m_nb_nodes);
+
 	size_t id(0);
 
-	Node n;
 	for (size_t i = 0; i < nx; i++)
 	{
 		for (size_t j = 0; j < ny; j++)
 		{
 			for (size_t k = 0; k < nz; k++)
 			{
-				n = Node(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
-				n.display();
-				m_nodes.push_back(n);
+				m_nodes_xyz.set_value(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
 				id++;
 			}
 		}
 	}
 
 
-	m_cells = std::vector<Cell>();
+	std::cout << "hello" << std::endl;
+	m_cells = std::vector<Cell>(m_nb_cells, Cell(m_nodes_xyz, 0, 0, 0, 0));
+	id = 0;
 
 	for (size_t i = 0; i < nx-1; i++)
 	{
@@ -42,11 +47,20 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 		{
 			for (size_t k = 0; k < nz-1; k++)
 			{
-				m_cells.push_back(Cell(m_nodes[i*ny*nz + j*nz + k], m_nodes[i*ny*nz + j*nz + k+1], m_nodes[i*ny*nz + (j+1)*nz + k], m_nodes[(i+1)*ny*nz + j*nz + k]));
-				m_cells.push_back(Cell(m_nodes[i*ny*nz + j*nz + k+1], m_nodes[i*ny*nz + (j+1)*nz + k+1], m_nodes[i*ny*nz + (j+1)*nz + k], m_nodes[(i+1)*ny*nz + (j+1)*nz + k+1]));
-				m_cells.push_back(Cell(m_nodes[i*ny*nz + (j+1)*nz + k], m_nodes[(i+1)*ny*nz + j*nz + k], m_nodes[(i+1)*ny*nz + (j+1)*nz + k], m_nodes[(i+1)*ny*nz + (j+1)*nz + k+1]));
-				m_cells.push_back(Cell(m_nodes[(i+1)*ny*nz + j*nz + k], m_nodes[i*ny*nz + j*nz + k+1], m_nodes[(i+1)*ny*nz + j*nz + (k+1)], m_nodes[(i+1)*ny*nz + (j+1)*nz + k+1]));
-				m_cells.push_back(Cell(m_nodes[(i+1)*ny*nz + j*nz + k], m_nodes[i*ny*nz + (j+1)*nz + k], m_nodes[i*ny*nz + j*nz + (k+1)], m_nodes[(i+1)*ny*nz + (j+1)*nz + k+1]));
+				m_cells[id].set_nodes_id(i*ny*nz + j*nz + k, i*ny*nz + j*nz + k+1, i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + j*nz + k);
+				id++;
+
+				m_cells[id].set_nodes_id(i*ny*nz + j*nz + k+1, i*ny*nz + (j+1)*nz + k+1, i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + (j+1)*nz + k+1);
+				id++;
+
+				m_cells[id].set_nodes_id(i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + j*nz + k, (i+1)*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + (j+1)*nz + k+1);
+				id++;
+
+				m_cells[id].set_nodes_id((i+1)*ny*nz + j*nz + k, i*ny*nz + j*nz + k+1, (i+1)*ny*nz + j*nz + (k+1), (i+1)*ny*nz + (j+1)*nz + k+1);
+				id++;
+
+				m_cells[id].set_nodes_id((i+1)*ny*nz + j*nz + k, i*ny*nz + (j+1)*nz + k, i*ny*nz + j*nz + (k+1), (i+1)*ny*nz + (j+1)*nz + k+1);
+				id++;
 			}
 		}
 	}
@@ -62,28 +76,28 @@ size_t Mesh3D::get_nb_cells() const
 	return m_nb_cells;
 }
 
-Node Mesh3D::get_node(size_t node_nb) const
+Vec3D Mesh3D::get_node_xyz(size_t node_id)
 {
-	return m_nodes[node_nb];
+	return m_nodes_xyz.get_value(node_id);
 }
 
-Cell const& Mesh3D::get_cell(size_t cell_nb) const
+Cell const& Mesh3D::get_cell(size_t cell_id) const
 {
-	return m_cells[cell_nb];
+	return m_cells[cell_id];
 }
 
-const Cell* Mesh3D::get_cell_ptr(size_t cell_nb) const
+const Cell* Mesh3D::get_cell_ptr(size_t cell_id) const
 {
-	return &m_cells[cell_nb];
+	return &m_cells[cell_id];
 }
 
-std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_nb) const
+std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_id) const
 {
 	std::vector<size_t> neighbors;
 
-	for (size_t i = 0; i < m_cells.size(); i++)
+	for (size_t i = 0; i < m_nb_cells; i++)
 	{
-		if (m_cells[i].contains(node_nb))
+		if (m_cells[i].contains(node_id))
 		{
 			neighbors.push_back(i);
 		}
@@ -92,21 +106,9 @@ std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_nb) const
 	return neighbors;
 }
 
-void Mesh3D::save(std::string file) const {} //TODO
+//void Mesh3D::save(std::string file) const {} //TODO
 
-Vec3D Mesh3D::get_node_xyz(size_t node_nb) const
+VectorField const& Mesh3D::get_all_nodes_xyz() const
 {
-	return get_node(node_nb).get_xyz();
-}
-
-Field<Vec3D> Mesh3D::get_all_nodes_xyz() const
-{
-	Field<Vec3D> f(m_nb_nodes);
-
-	for (size_t n = 0; n < m_nb_nodes; n++)
-	{
-		f.set_value(n, get_node(n).get_xyz());
-	}
-
-	return f;
+	return m_nodes_xyz;
 }

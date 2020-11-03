@@ -2,13 +2,13 @@
 
 #include <cstddef>
 #include <stdexcept>
-#include "Node.hxx"
-#include "Vec3D.hxx"
+#include "VectorField.hxx"
 
 class Cell
 {
 private:
-	Node m_N0, m_N1, m_N2, m_N3;
+	VectorField const& m_nodes_ref;
+	size_t m_N0_id, m_N1_id, m_N2_id, m_N3_id;
 	
 	double m_volume;
 	double m_ddx_lamb0, m_ddy_lamb0, m_ddz_lamb0;
@@ -17,15 +17,22 @@ private:
 	double m_ddx_lamb3, m_ddy_lamb3, m_ddz_lamb3;
 
 public:
-	Cell();
-	Cell(Node const& N0, Node const& N1, Node const& N2, Node const& N3);
+	Cell(VectorField const& nodes);
+	Cell(VectorField const& nodes, size_t N0_id, size_t N1_id, size_t N2_id, size_t N3_id);
 	Cell(Cell const& cell);
 	~Cell();
 
 	void compute_nodes();
 
-	Node const& get_node(size_t node_nb) const;
-	bool contains(size_t node_nb) const;
+	void set_global_node_id(size_t local_node_id, size_t global_node_id);
+	void set_nodes_id(size_t N0_id, size_t N1_id, size_t N2_id, size_t N3_id);
+	size_t get_global_node_id(size_t local_node_id) const;
+	Vec3D get_node_xyz(size_t local_node_id) const;
+
+	//void set_nodes_ref(VectorField const& nodes);
+	VectorField const& get_nodes_ref() const;
+	
+	bool contains(size_t global_node_id) const;
 
 	double get_volume() const;
 
@@ -44,7 +51,7 @@ public:
 	double get_ddz_lamb2() const;
 	double get_ddz_lamb3() const;
 
-	void display() const;
+	//void display() const;
 	
 	Cell operator=(Cell const& cell);
 };

@@ -5,9 +5,9 @@
 #include <list>
 #include <iostream>
 #include <string>
-#include "UnsteadyField.hxx"
+#include "ScalarField.hxx"
+#include "VectorField.hxx"
 #include "Vec3D.hxx"
-#include "BoundaryCondition.hxx"
 
 class DataKeeper
 {
@@ -23,11 +23,11 @@ private:
 	size_t m_nb_nodes;
 	size_t m_nb_cells;
 
-	UnsteadyField<double> m_rho;
-	UnsteadyField<Vec3D> m_j;
-	UnsteadyField<Vec3D> m_E, m_B;
+	std::vector<ScalarField> m_rho;
+	std::vector<VectorField> m_j;
+	std::vector<VectorField> m_E, m_B;
 
-	std::vector<BoundaryCondition> m_BC;
+	std::vector<size_t> m_BC;
 
 public:
 	DataKeeper();
@@ -57,23 +57,21 @@ public:
 	double get_rho(size_t t, size_t node_nb) const;
 	void set_rho(size_t t, size_t node_nb, double rho);
 
-	Vec3D get_j(size_t t, size_t node_nb) const;
+	Vec3D get_j(size_t t, size_t node_nb);
 	void set_j(size_t t, size_t node_nb, Vec3D j);
 
-	Vec3D get_E(size_t t, size_t node_nb) const;
+	Vec3D get_E(size_t t, size_t node_nb);
 	void set_E(size_t t, size_t node_nb, Vec3D E);
 	
-	Vec3D get_B(size_t t, size_t node_nb) const;
+	Vec3D get_B(size_t t, size_t node_nb);
 	void set_B(size_t t, size_t node_nb, Vec3D B);
 	
 	void erase_BCs();
-	void add_BC(size_t node_nb, Vec3D E, Vec3D B);
-	Vec3D get_boundary_condition_E(size_t node_nb) const;
-	Vec3D get_boundary_condition_B(size_t node_nb) const;
+	void add_BC(size_t node_nb);
+	Vec3D get_boundary_condition_E(size_t node_nb);
+	Vec3D get_boundary_condition_B(size_t node_nb);
 
 	bool boundary_node(size_t node_nb) const;
-
-	bool check_ID_BC_compatibility() const;
 
 	//void save(std::string file) const;
 };

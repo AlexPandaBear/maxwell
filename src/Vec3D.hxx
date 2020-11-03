@@ -1,33 +1,64 @@
 #pragma once
 
 #include <cmath>
+#include <stdexcept>
 
 /**
- * A class representing a 3-component vector (x, y, z) of real numbers
+ * A class representing a 3-component vector (x, y, z) of real numbers, with data stored inside the obect (local data / default behavior) or as a view on 3 outside variables (distant data / view behavior - obtained when initialized with pointers)
  */
 class Vec3D
 {
 private:
+	bool m_view;
+
 	double m_x;
 	double m_y;
 	double m_z;
 
+	double const * m_ptr_x;
+	double const * m_ptr_y;
+	double const * m_ptr_z;
+
 public:
 	/**
-	 * The default constructor of the class, which initializes all components to 0
+	 * The default constructor of the class, which initializes all the components to zero (local data behavior)
+	 *
+	 * @remark Using this constructor the instance will follow the default behavior (local data)
 	 */
 	Vec3D();
 
 	/**
-	 * A constructor of the class allowing to choose the initialization values of all the components
+	 * A constructor of the class allowing to choose the initialization values of the components (local data behavior)
 	 *
-	 * @param x The value of the first component
+	 * @param x The value for the first component
 	 *
-	 * @param y The value of the second component
+	 * @param y The value for the second component
 	 *
-	 * @param z The value of the third component
+	 * @param z The value for the third component
+	 *
+	 * @remark Using this constructor the instance will follow the default behavior (local data)
 	 */
 	Vec3D(double x, double y, double z);
+
+	/**
+	 * A constructor of the class allowing to choose the initialization all the pointer to components
+	 *
+	 * @param ptr_x A pointer to the value of the first component
+	 *
+	 * @param ptr_y A pointer to the value of the second component
+	 *
+	 * @param ptr_z A pointer to the value of the third component
+	 *
+	 * @remark Using this constructor the instance will follow the view behavior (distant data)
+	 */
+	Vec3D(double* ptr_x, double* ptr_y, double* ptr_z);
+
+	/**
+	 * The copy constructor of the class
+	 *
+	 * @remark Using this constructor the new instance will follow the default behavior (local data), regardless of the copied instance behavior
+	 */
+	Vec3D(Vec3D const& v);
 
 	/**
 	 * The destructor of the class
@@ -123,54 +154,14 @@ public:
 	 *
 	 * @returns true if all the components are equal, false otherwise
 	 */
-	bool operator==(Vec3D const& v);
+	bool operator==(Vec3D const& v) const;
 
 	/**
 	 * A boolean operator ckecking the non-equality of two vectors
 	 *
 	 * @returns true if at least one component is different, false otherwise
 	 */
-	bool operator!=(Vec3D const& v);
-
-	/**
-	 * A summation operator computing the result of the addition with another vector
-	 *
-	 * @param v The other vector
-	 *
-	 * @returns The sum of the two vectors
-	 */
-	Vec3D operator+(Vec3D const& v) const;
-	
-	/**
-	 * A difference operator computing the result of the difference with another vector
-	 *
-	 * @param v The other vector
-	 *
-	 * @returns The difference of the two vectors
-	 */
-	Vec3D operator-(Vec3D const& v) const;
-
-	/**
-	 * An external product operator compution de result of the multiplication by a scalar
-	 *
-	 * @param a The scalar
-	 *
-	 * @returns The product of the vector by the scalar
-	 *
-	 * @warning The product is only defined by the right
-	 */
-	Vec3D operator*(double a) const;
-	
-	/**
-	 * An external division operator compution de result of the division by a scalar
-	 *
-	 * @param a The scalar
-	 *
-	 * @returns The division of the vector by the scalar
-	 *
-	 * @warning The division is only defined by the right
-	 */
-	Vec3D operator/(double a) const;
+	bool operator!=(Vec3D const& v) const;
 
 	/**
 	 * An incrementation operator based on the summation operator
@@ -209,6 +200,50 @@ public:
 	void operator/=(double a);
 
 	/**
+	 * A summation operator
+	 *
+	 * @param v The Vec3D operand
+	 *
+	 * @returns The Vec3D resulting of the summation
+	 *
+	 * @remark The returned instance will follow the default behavior (local data)
+	 */
+	Vec3D operator+(Vec3D const& v) const;
+	
+	/**
+	 * A difference operator
+	 *
+	 * @param v The Vec3D operand
+	 *
+	 * @returns The Vec3D resulting of the difference
+	 *
+	 * @remark The returned instance will follow the default behavior (local data)
+	 */
+	Vec3D operator-(Vec3D const& v) const;
+	
+	/**
+	 * An external product operator
+	 *
+	 * @param a The external operand
+	 *
+	 * @returns The Vec3D resulting of the multiplication
+	 *
+	 * @remark The returned instance will follow the default behavior (local data)
+	 */
+	Vec3D operator*(double a) const;
+	
+	/**
+	 * An external division operator
+	 *
+	 * @param a The external operand
+	 *
+	 * @returns The Vec3D resulting of the division
+	 *
+	 * @remark The returned instance will follow the default behavior (local data)
+	 */
+	Vec3D operator/(double a) const;
+
+	/**
 	 * A static method computing the dot product of two vectors
 	 *
 	 * @param v1 The first vector
@@ -227,6 +262,8 @@ public:
 	 * @param v2 The second vector
 	 *
 	 * @returns The cross product v1^v2
+	 *
+	 * @remark The returned instance will follow the default behavior (local data)
 	 */
 	static Vec3D cross_product(Vec3D const& v1, Vec3D const& v2);
 };

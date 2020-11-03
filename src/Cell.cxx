@@ -1,21 +1,24 @@
 #include "Cell.hxx"
 
-Cell::Cell() {}
+Cell::Cell(VectorField const& nodes) :
+	m_nodes_ref(nodes) {}
 
-Cell::Cell(Node const& N0, Node const& N1, Node const& N2, Node const& N3) :
-	m_N0(N0),
-	m_N1(N1),
-	m_N2(N2),
-	m_N3(N3)
+Cell::Cell(VectorField const& nodes, size_t N0_id, size_t N1_id, size_t N2_id, size_t N3_id) :
+	m_nodes_ref(nodes),
+	m_N0_id(N0_id),
+	m_N1_id(N1_id),
+	m_N2_id(N2_id),
+	m_N3_id(N3_id)
 {
 	compute_nodes();
 }
 
 Cell::Cell(Cell const& cell) :
-	m_N0(cell.get_node(0)),
-	m_N1(cell.get_node(1)),
-	m_N2(cell.get_node(2)),
-	m_N3(cell.get_node(3))
+	m_nodes_ref(cell.get_nodes_ref()),
+	m_N0_id(cell.get_global_node_id(0)),
+	m_N1_id(cell.get_global_node_id(1)),
+	m_N2_id(cell.get_global_node_id(2)),
+	m_N3_id(cell.get_global_node_id(3))
 {
 	compute_nodes();
 }
@@ -24,10 +27,12 @@ Cell::~Cell() {}
 
 void Cell::compute_nodes()
 {
-	double x0(m_N0.get_x()), y0(m_N0.get_y()), z0(m_N0.get_z());
-	double x1(m_N1.get_x()), y1(m_N1.get_y()), z1(m_N1.get_z());
-	double x2(m_N2.get_x()), y2(m_N2.get_y()), z2(m_N2.get_z());
-	double x3(m_N3.get_x()), y3(m_N3.get_y()), z3(m_N3.get_z());
+	Vec3D N0(m_nodes_ref.get_value(m_N0_id)), N1(m_nodes_ref.get_value(m_N1_id)), N2(m_nodes_ref.get_value(m_N2_id)), N3(m_nodes_ref.get_value(m_N3_id));
+
+	double x0(N0.get_x()), y0(N0.get_y()), z0(N0.get_z());
+	double x1(N1.get_x()), y1(N1.get_y()), z1(N1.get_z());
+	double x2(N2.get_x()), y2(N2.get_y()), z2(N2.get_z());
+	double x3(N3.get_x()), y3(N3.get_y()), z3(N3.get_z());
 
 
 	m_volume = ( (x1-x0)*(y2-y0)*(z3-z0) + (x3-x0)*(y1-y0)*(z2-z0) + (x2-x0)*(y3-y0)*(z1-z0) - (x1-x0)*(y3-y0)*(z2-z0) - (x2-x0)*(y1-y0)*(z3-z0) - (x3-x0)*(y2-y0)*(z1-z0) )/6.;
@@ -83,21 +88,67 @@ void Cell::compute_nodes()
 	}
 }
 
-Node const& Cell::get_node(size_t node_nb) const
+void Cell::set_global_node_id(size_t local_node_id, size_t global_node_id)
 {
-	switch (node_nb)
+	switch (local_node_id)
 	{
-		case 0: return m_N0;
-		case 1: return m_N1;
-		case 2: return m_N2;
-		case 3: return m_N3;
+		case 0: m_N0_id = global_node_id;
+		case 1: m_N1_id = global_node_id;
+		case 2: m_N2_id = global_node_id;
+		case 3: m_N3_id = global_node_id;
+		default: throw std::invalid_argument("Invalid local node number");
+	}
+
+	compute_nodes();
+}
+
+void Cell::set_nodes_id(size_t N0_id, size_t N1_id, size_t N2_id, size_t N3_id)
+{
+	m_N0_id = N0_id;
+	m_N1_id = N1_id;
+	m_N2_id = N2_id;
+	m_N3_id = N3_id;
+
+	compute_nodes();
+}
+
+size_t Cell::get_global_node_id(size_t local_node_id) const
+{
+	switch (local_node_id)
+	{
+		case 0: return m_N0_id;
+		case 1: return m_N1_id;
+		case 2: return m_N2_id;
+		case 3: return m_N3_id;
 		default: throw std::invalid_argument("Invalid local node number");
 	}
 }
 
-bool Cell::contains(size_t node_nb) const
+Vec3D Cell::get_node_xyz(size_t local_node_id) const
 {
-	if (node_nb == m_N0.get_id() || node_nb == m_N1.get_id() || node_nb == m_N2.get_id() || node_nb == m_N3.get_id())
+	switch (local_node_id)
+	{
+		case 0: return m_nodes_ref.get_value(m_N0_id);
+		case 1: return m_nodes_ref.get_value(m_N1_id);
+		case 2: return m_nodes_ref.get_value(m_N2_id);
+		case 3: return m_nodes_ref.get_value(m_N3_id);
+		default: throw std::invalid_argument("Invalid local node number");
+	}
+}
+/*
+void Cell::set_nodes_ref(VectorField const& nodes)
+{
+	m_nodes_ref = nodes;
+}
+*/
+VectorField const& Cell::get_nodes_ref() const
+{
+	return m_nodes_ref;
+}
+
+bool Cell::contains(size_t global_node_id) const
+{
+	if (global_node_id == m_N0_id || global_node_id == m_N1_id || global_node_id == m_N2_id || global_node_id == m_N3_id)
 	{
 		return true;
 	}
@@ -169,7 +220,7 @@ double Cell::get_ddz_lamb3() const
 {
 	return m_ddz_lamb3;
 }
-
+/*
 void Cell::display() const
 {
 	m_N0.display();
@@ -177,7 +228,7 @@ void Cell::display() const
 	m_N2.display();
 	m_N3.display();
 }
-
+*/
 Cell Cell::operator=(Cell const& cell)
 {
 	Cell copy(cell);

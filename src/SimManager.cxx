@@ -26,6 +26,7 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	m_data.set_max_nb_iterations(max_nb_iterations);
 	m_mesh = Mesh3D();
 	m_mesh.generate_grid_mesh(x_min, x_max, y_min, y_max, z_min, z_max, nx, ny, nz);
+	std::cout << "coucou" << std::endl;
 	m_data.reset_dimensions(nb_steps, m_mesh.get_nb_nodes(), m_mesh.get_nb_cells());
 	m_data.erase_BCs();
 }
@@ -72,7 +73,7 @@ double SimManager::estimate_wire_intersection(Vec3D pt_A, Vec3D pt_B, double rad
 		gamma = generate_random_double(0., 1. - (alpha + beta));
 		delta = 1. - (alpha + beta + gamma);
 
-		random_pt = ptr_cell->get_node(0).get_xyz()*alpha + ptr_cell->get_node(1).get_xyz()*beta + ptr_cell->get_node(2).get_xyz()*gamma + ptr_cell->get_node(3).get_xyz()*delta;
+		random_pt = ptr_cell->get_node_xyz(0)*alpha + ptr_cell->get_node_xyz(1)*beta + ptr_cell->get_node_xyz(2)*gamma + ptr_cell->get_node_xyz(3)*delta;
 
 		if (compute_distance_to_axis(random_pt, pt_A, pt_B) > radius)
 		{
@@ -108,9 +109,9 @@ void SimManager::add_wire(std::vector<Vec3D> wire_skeleton, double wire_radius, 
 	}
 }
 
-void SimManager::add_boundary_condition(size_t node_nb, Vec3D E, Vec3D B)
+void SimManager::add_boundary_condition(size_t node_nb)
 {
-	m_data.add_BC(node_nb, E, B);
+	m_data.add_BC(node_nb);
 }
 
 void SimManager::simulate()
@@ -125,12 +126,12 @@ void SimManager::save(std::string simulation_name) const
 	m_data.save(simulation_name + ".d");
 }
 */
-Field<Vec3D> SimManager::get_mesh()
+VectorField const& SimManager::get_mesh()
 {
 	return m_mesh.get_all_nodes_xyz();
 }
 
-UnsteadyField<double> const& SimManager::get_energy_density()
+ScalarField const& SimManager::get_energy_density(size_t step)
 {
-	return m_processor.get_energy_density();
+	return m_processor.get_energy_density(step);
 }
