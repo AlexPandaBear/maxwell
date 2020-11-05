@@ -390,6 +390,11 @@ double UnsteadyMaxwellKernel::GS_iteration()
 	return 0.5*energy_diff/m_nb_nodes;
 }
 
+void UnsteadyMaxwellKernel::display_progression(size_t step) const
+{
+	std::cout << "\r - Simulating (step " << step+1 << " / " << m_nb_steps << " -- " << 100*(step+1)/m_nb_steps << " % completed)     " << std::flush;
+}
+
 void UnsteadyMaxwellKernel::simulate()
 {
 	if (!check_divergence_in_ID())
@@ -403,6 +408,8 @@ void UnsteadyMaxwellKernel::simulate()
 
 	for (size_t t = 0; t < m_nb_steps; t++)
 	{
+		display_progression(t);
+
 		build_vector_B(t);
 		size_t k(0);
 

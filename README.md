@@ -51,5 +51,5 @@ user@linux:~/path/to/code/build$ make reference_doc
 Execute these commands to get to the python directory and add the library to the PYTHONPATH.
 ```console
 user@linux:~/path/to/code$ cd python
-user@linux:~/path/to/code/python$ export PYTHONPATH=$PWD/../build/install/lib/python
+user@linux:~/path/to/code/python$ python simulation.py
 ```

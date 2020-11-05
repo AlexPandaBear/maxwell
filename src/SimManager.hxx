@@ -29,6 +29,10 @@ public:
 
 	//void save(std::string simulation_name) const;
 
+	size_t get_nb_nodes() const;
+	size_t get_nb_cells() const;
+	std::vector<size_t> get_node_ids(size_t cell_id) const;
+
 	VectorField const& get_mesh();
 	ScalarField const& get_energy_density(size_t step);
 };

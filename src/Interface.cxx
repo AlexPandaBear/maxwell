@@ -52,6 +52,9 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("simulate", &SimManager::simulate)
 		//.def("save", &SimManager::save,
 		//	py::arg("simulation_name"))
+		.def("getNbNodes", &SimManager::get_nb_nodes)
+		.def("getNbCells", &SimManager::get_nb_cells)
+		.def("getNodeIds", &SimManager::get_node_ids)
 		.def("getMesh", &SimManager::get_mesh)
 		.def("getEnergyDensity", &SimManager::get_energy_density);
 

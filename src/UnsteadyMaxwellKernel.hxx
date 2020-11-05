@@ -34,6 +34,8 @@ private:
 	double GS_step(size_t i) const;
 	double GS_iteration();
 
+	void display_progression(size_t step) const;
+
 public:
 	UnsteadyMaxwellKernel(Mesh3D& mesh, DataKeeper& data);
 	~UnsteadyMaxwellKernel();

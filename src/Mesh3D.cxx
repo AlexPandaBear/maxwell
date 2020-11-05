@@ -37,7 +37,6 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	}
 
 
-	std::cout << "hello" << std::endl;
 	m_cells = std::vector<Cell>(m_nb_cells, Cell(m_nodes_xyz, 0, 0, 0, 0));
 	id = 0;
 

@@ -26,7 +26,6 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	m_data.set_max_nb_iterations(max_nb_iterations);
 	m_mesh = Mesh3D();
 	m_mesh.generate_grid_mesh(x_min, x_max, y_min, y_max, z_min, z_max, nx, ny, nz);
-	std::cout << "coucou" << std::endl;
 	m_data.reset_dimensions(nb_steps, m_mesh.get_nb_nodes(), m_mesh.get_nb_cells());
 	m_data.erase_BCs();
 }
@@ -126,6 +125,23 @@ void SimManager::save(std::string simulation_name) const
 	m_data.save(simulation_name + ".d");
 }
 */
+
+size_t SimManager::get_nb_nodes() const
+{
+	return m_mesh.get_nb_nodes();
+}
+
+size_t SimManager::get_nb_cells() const
+{
+	return m_mesh.get_nb_cells();
+}
+
+std::vector<size_t> SimManager::get_node_ids(size_t cell_id) const
+{
+	Cell cell = m_mesh.get_cell(cell_id);
+	return {cell.get_global_node_id(0), cell.get_global_node_id(1), cell.get_global_node_id(2), cell.get_global_node_id(3)};
+}
+
 VectorField const& SimManager::get_mesh()
 {
 	return m_mesh.get_all_nodes_xyz();
