@@ -3,7 +3,9 @@
 DataProcessor::DataProcessor(DataKeeper& data) :
 	m_data(data),
 	m_energy_ready(false),
-	m_energy(std::vector<ScalarField>(0, ScalarField(0))) {}
+	m_poynting_ready(false),
+	m_energy(std::vector<ScalarField>(0, ScalarField(0))),
+	m_poynting(std::vector<VectorField>(0, VectorField(0))) {}
 
 DataProcessor::~DataProcessor() {}
 
@@ -28,6 +30,26 @@ void DataProcessor::compute_energy()
 	m_energy_ready = true;
 }
 
+void DataProcessor::compute_poynting()
+{
+	size_t nb_steps(m_data.get_nb_steps());
+	size_t nb_nodes(m_data.get_nb_nodes());
+
+	double inv_mu(1. / m_data.get_mu());
+
+	m_poynting = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
+
+	for (size_t t = 0; t < nb_steps+1; t++)
+	{
+		for (size_t n = 0; n < nb_nodes; n++)
+		{
+			m_poynting[t].set_value(n, Vec3D::cross_product(m_data.get_E(t, n), m_data.get_B(t, n)) * inv_mu);
+		}
+	}
+
+	m_poynting_ready = true;
+}
+
 void DataProcessor::compute_all()
 {
 	compute_energy();
@@ -41,4 +63,14 @@ ScalarField const& DataProcessor::get_energy_density(size_t step)
 	}
 
 	return m_energy[step];
+}
+
+VectorField const& DataProcessor::get_poynting_vector(size_t step)
+{
+	if (!m_poynting_ready)
+	{
+		compute_poynting();
+	}
+
+	return m_poynting[step];
 }

@@ -151,3 +151,8 @@ ScalarField const& SimManager::get_energy_density(size_t step)
 {
 	return m_processor.get_energy_density(step);
 }
+
+VectorField const& SimManager::get_poynting_vector(size_t step)
+{
+	return m_processor.get_poynting_vector(step);
+}

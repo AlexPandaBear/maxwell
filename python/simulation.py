@@ -4,6 +4,7 @@ print("----------------------------------------------------------------------\n"
 
 
 
+
 print("--- [ LOADING MODULES ] ----------------------------------------------")
 
 print(" - Matplotlib", end=" ")
@@ -35,6 +36,7 @@ import _maxwell as mxll
 print("[ OK ]")
 
 print("--------------------------------------------------------- [ DONE ] ---\n")
+
 
 
 
@@ -86,6 +88,7 @@ print("--------------------------------------------------------- [ DONE ] ---\n"
 
 
 
+
 print("--- [ COMUTATING ] ---------------------------------------------------")
 
 print(" - Creation of simulation environment", end=" ")
@@ -114,12 +117,12 @@ print("--------------------------------------------------------- [ DONE ] ---\n"
 
 
 
+
 M = np.asarray(S.getMesh())
 E = [np.asarray(S.getEnergyDensity(i)) for i in range(nb_steps+1)]
 
 
 
-#%% MESH PLOT
 
 print("Plotting mesh...")
 
@@ -149,7 +152,6 @@ plt.show()
 
 
 
-#%% ENERGY PLOT
 
 print("Plotting energy density field...")
 
@@ -168,3 +170,10 @@ if (nb_steps+1 > max_frames):
 animate = anim.FuncAnimation(fig, update_energy_plot, frames, fargs=(M, E, ax))
 fig.colorbar(cm.ScalarMappable(norm=None, cmap='jet'), ax=ax)
 plt.show()
+
+
+
+
+print("----------------------------------------------------------------------")
+print("----------------------------------------------------------------------")
+print("----------------------------------------------------------------------")

@@ -12,7 +12,6 @@ cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'SparseMatrix.c
 #include <pybind11/numpy.h>
 #include "SimManager.hxx"
 #include "Vec3D.hxx"
-#include "UnsteadyField.hxx"
 
 namespace py = pybind11;
 
@@ -56,7 +55,10 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getNbCells", &SimManager::get_nb_cells)
 		.def("getNodeIds", &SimManager::get_node_ids)
 		.def("getMesh", &SimManager::get_mesh)
-		.def("getEnergyDensity", &SimManager::get_energy_density);
+		.def("getEnergyDensity", &SimManager::get_energy_density,
+			py::arg("step"))
+		.def("getPoyntingVector", &SimManager::get_poynting_vector,
+			py::arg("step"));
 
 	py::class_<Vec3D>(m, "Vec3D")
 		.def(py::init<>())

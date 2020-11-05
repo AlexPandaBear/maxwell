@@ -35,4 +35,5 @@ public:
 
 	VectorField const& get_mesh();
 	ScalarField const& get_energy_density(size_t step);
+	VectorField const& get_poynting_vector(size_t step);
 };
