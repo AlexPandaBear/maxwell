@@ -15,6 +15,7 @@ private:
 
 	VectorField m_nodes_xyz;
 	std::vector<Cell> m_cells;
+	std::vector<size_t> m_boundary_nodes;
 
 
 public:
@@ -35,4 +36,5 @@ public:
 	//void save(std::string file) const;
 
 	VectorField const& get_all_nodes_xyz() const;
+	std::vector<size_t> const& get_boundary_nodes() const;
 };

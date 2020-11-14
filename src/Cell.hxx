@@ -11,10 +11,7 @@ private:
 	size_t m_N0_id, m_N1_id, m_N2_id, m_N3_id;
 	
 	double m_volume;
-	double m_ddx_lamb0, m_ddy_lamb0, m_ddz_lamb0;
-	double m_ddx_lamb1, m_ddy_lamb1, m_ddz_lamb1;
-	double m_ddx_lamb2, m_ddy_lamb2, m_ddz_lamb2;
-	double m_ddx_lamb3, m_ddy_lamb3, m_ddz_lamb3;
+	Vec3D m_S_012, m_S_013, m_S_023, m_S_123;
 
 public:
 	Cell(VectorField const& nodes);
@@ -35,23 +32,7 @@ public:
 	bool contains(size_t global_node_id) const;
 
 	double get_volume() const;
-
-	double get_ddx_lamb0() const;
-	double get_ddx_lamb1() const;
-	double get_ddx_lamb2() const;
-	double get_ddx_lamb3() const;
-
-	double get_ddy_lamb0() const;
-	double get_ddy_lamb1() const;
-	double get_ddy_lamb2() const;
-	double get_ddy_lamb3() const;
-
-	double get_ddz_lamb0() const;
-	double get_ddz_lamb1() const;
-	double get_ddz_lamb2() const;
-	double get_ddz_lamb3() const;
-
-	//void display() const;
+	Vec3D get_surface(size_t opposite_node_local_id) const;
 	
 	Cell operator=(Cell const& cell);
 };

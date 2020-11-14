@@ -3,6 +3,7 @@
 DataKeeper::DataKeeper() :
 	m_eps(0.),
 	m_mu(0.),
+	m_sigma(0.),
 	m_nb_steps(0),
 	m_t_max(0.),
 	m_theta(0.),
@@ -10,6 +11,7 @@ DataKeeper::DataKeeper() :
 	m_max_nb_iterations(0),
 	m_nb_nodes(0),
 	m_nb_cells(0),
+	m_time(std::vector<double>()),
 	m_rho(std::vector<ScalarField>(0, ScalarField(0))),
 	m_j(std::vector<VectorField>(0, VectorField(0))),
 	m_E(std::vector<VectorField>(0, VectorField(0))),
@@ -28,6 +30,11 @@ double DataKeeper::get_epsilon() const
 double DataKeeper::get_mu() const
 {
 	return m_mu;
+}
+
+double DataKeeper::get_sigma() const
+{
+	return m_sigma;
 }
 
 double DataKeeper::get_t_max() const
@@ -71,8 +78,9 @@ void DataKeeper::reset_dimensions(size_t nb_steps, size_t nb_nodes, size_t nb_ce
 	m_nb_nodes = nb_nodes;
 	m_nb_cells = nb_cells;
 
-	m_rho = std::vector<ScalarField>(nb_steps+1, ScalarField(nb_cells));
-	m_j = std::vector<VectorField>(nb_steps+1, VectorField(nb_cells));
+	m_time = std::vector<double>(nb_steps+1, 0.);
+	m_rho = std::vector<ScalarField>(nb_steps+1, ScalarField(nb_nodes));
+	m_j = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
 	m_E = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
 	m_B = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
 
@@ -87,6 +95,11 @@ void DataKeeper::set_epsilon(double epsilon)
 void DataKeeper::set_mu(double mu)
 {
 	m_mu = mu;
+}
+
+void DataKeeper::set_sigma(double sigma)
+{
+	m_sigma = sigma;
 }
 
 void DataKeeper::set_t_max(double t_max)
@@ -109,9 +122,29 @@ void DataKeeper::set_max_nb_iterations(size_t max_nb_iterations)
 	m_max_nb_iterations = max_nb_iterations;
 }
 
+double DataKeeper::get_time(size_t step) const
+{
+	return m_time[step];
+}
+
+std::vector<double> const& DataKeeper::get_time() const
+{
+	return m_time;
+}
+
+void DataKeeper::set_time(size_t step, double time)
+{
+	m_time[step] = time;
+}
+
 double DataKeeper::get_rho(size_t t, size_t node_nb) const
 {
 	return m_rho[t].get_value(node_nb);
+}
+
+ScalarField const& DataKeeper::get_rho(size_t step) const
+{
+	return m_rho[step];
 }
 
 void DataKeeper::set_rho(size_t t, size_t node_nb, double rho)
@@ -124,6 +157,11 @@ Vec3D DataKeeper::get_j(size_t t, size_t node_nb)
 	return m_j[t].get_value(node_nb);
 }
 
+VectorField const& DataKeeper::get_j(size_t step) const
+{
+	return m_j[step];
+}
+
 void DataKeeper::set_j(size_t t, size_t node_nb, Vec3D j)
 {
 	m_j[t].set_value(node_nb, j);
@@ -134,6 +172,11 @@ Vec3D DataKeeper::get_E(size_t t, size_t node_nb)
 	return m_E[t].get_value(node_nb);
 }
 
+VectorField const& DataKeeper::get_E(size_t step) const
+{
+	return m_E[step];
+}
+
 void DataKeeper::set_E(size_t t, size_t node_nb, Vec3D E)
 {
 	m_E[t].set_value(node_nb, E);
@@ -142,6 +185,11 @@ void DataKeeper::set_E(size_t t, size_t node_nb, Vec3D E)
 Vec3D DataKeeper::get_B(size_t t, size_t node_nb)
 {
 	return m_B[t].get_value(node_nb);
+}
+
+VectorField const& DataKeeper::get_B(size_t step) const
+{
+	return m_B[step];
 }
 
 void DataKeeper::set_B(size_t t, size_t node_nb, Vec3D B)
@@ -196,6 +244,11 @@ bool DataKeeper::boundary_node(size_t node_nb) const
 	}
 
 	return false;
+}
+
+std::vector<size_t> const& DataKeeper::get_dirichlet_nodes() const
+{
+	return m_BC;
 }
 
 //void DataKeeper::save(std::string file) const {} //TODO

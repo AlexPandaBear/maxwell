@@ -4,7 +4,8 @@ Mesh3D::Mesh3D() :
 	m_nb_nodes(0),
 	m_nb_cells(0),
 	m_nodes_xyz(VectorField(0)),
-	m_cells(0, Cell(m_nodes_xyz)) {}
+	m_cells(0, Cell(m_nodes_xyz)),
+	m_boundary_nodes() {}
 
 //Mesh3D::Mesh3D(std::string file) {} //TODO
 
@@ -31,6 +32,12 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 			for (size_t k = 0; k < nz; k++)
 			{
 				m_nodes_xyz.set_value(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
+
+				if (i == 0 || i == nx-1 || j == 0 || j == ny-1 || k == 0 || k == nz-1)
+				{
+					m_boundary_nodes.push_back(id);
+				}
+
 				id++;
 			}
 		}
@@ -110,4 +117,9 @@ std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_id) const
 VectorField const& Mesh3D::get_all_nodes_xyz() const
 {
 	return m_nodes_xyz;
+}
+
+std::vector<size_t> const& Mesh3D::get_boundary_nodes() const
+{
+	return m_boundary_nodes;
 }

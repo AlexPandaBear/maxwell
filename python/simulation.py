@@ -7,7 +7,7 @@ print("----------------------------------------------------------------------\n"
 
 print("--- [ LOADING MODULES ] ----------------------------------------------")
 
-print(" - Matplotlib", end=" ")
+print("Matplotlib", end=" ")
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as anim
@@ -16,14 +16,14 @@ from mpl_toolkits.mplot3d import Axes3D
 
 print("[ OK ]")
 
-print(" - NumPy", end=" ")
+print("NumPy", end=" ")
 
 import numpy as np
 from itertools import combinations
 
 print("[ OK ]")
 
-print(" - Maxwell", end=" ")
+print("Maxwell", end=" ")
 
 mxll_path = "../build/install/lib/python"
 import sys
@@ -42,36 +42,36 @@ print("--------------------------------------------------------- [ DONE ] ---\n"
 
 print("--- [ LOADING PARAMETERS ] -------------------------------------------")
 
-print(" - Physical constants", end=" ")
+print("Physical constants", end=" ")
 
 epsilon0 = 8.854187e-12
 mu0 = np.pi*4.e-7
 
 print("[ OK ]")
 
-print(" - Time-stepping parameters", end=" ")
+print("Time-stepping parameters", end=" ")
 
-tMax = 1.e-8
+tMax = 1.e-9
 nb_steps = 10
-theta = 0.5
-accuracy = 0.01
-max_nb_iterations = 2
+theta = 0
+accuracy = 0.00001
+max_nb_iterations = 100
 
 print("[ OK ]")
 
-print(" - Mesh parameters", end=" ")
+print("Mesh parameters", end=" ")
 
 Lx = 1.
 Ly = 1.
 Lz = 1.
 
-nx = 3
-ny = 3
-nz = 3
+nx = 4
+ny = 4
+nz = 4
 
 print("[ OK ]")
 
-print(" - Initial state", end=" ")
+print("Initial state", end=" ")
 
 rho0_bg = 0.
 j0_bg = mxll.Vec3D(0., 0., 0.)
@@ -89,29 +89,18 @@ print("--------------------------------------------------------- [ DONE ] ---\n"
 
 
 
-print("--- [ COMUTATING ] ---------------------------------------------------")
+print("--- [ COMPUTING ] ----------------------------------------------------")
 
-print(" - Creation of simulation environment", end=" ")
 S = mxll.SM()
-print("[ OK ]")
-
-print(" - Definition of the constants", end=" ")
-S.setConstants(epsilon0, mu0)
-print("[ OK ]")
-
-print(" - Creation of the mesh and the time samples", end=" ")
+S.setConstants(epsilon0, mu0, 1.)
 S.setSimulationParameters(tMax, nb_steps, theta, accuracy, max_nb_iterations, 0., Lx, 0., Ly, 0., Lz, nx, ny, nz)
-print("[ OK ]")
-
-print(" - Definition of the initial state", end=" ")
 S.defineInitialStateBackgroundValues(rho0_bg, j0_bg, E0_bg, B0_bg)
-print("[ OK ]")
+S.lockAllBoundaryNodes()
 
 #S.addWire(wire_sklt, wire_rad, wire_current)
 #S.addBoundaryCondition(...)
 
 S.simulate()
-print("[ OK ]")
 
 print("--------------------------------------------------------- [ DONE ] ---\n")
 
@@ -119,8 +108,15 @@ print("--------------------------------------------------------- [ DONE ] ---\n"
 
 
 M = np.asarray(S.getMesh())
-E = [np.asarray(S.getEnergyDensity(i)) for i in range(nb_steps+1)]
+T = np.asarray(S.getTime())
 
+R = [np.asarray(S.getRho(i)) for i in range(nb_steps+1)]
+J = [np.asarray(S.getJ(i)) for i in range(nb_steps+1)]
+E = [np.asarray(S.getE(i)) for i in range(nb_steps+1)]
+B = [np.asarray(S.getB(i)) for i in range(nb_steps+1)]
+
+U = [np.asarray(S.getEnergyDensity(i)) for i in range(nb_steps+1)]
+P = [np.asarray(S.getPoyntingVector(i)) for i in range(nb_steps+1)]
 
 
 
@@ -152,23 +148,54 @@ plt.show()
 
 
 
+frames = range(nb_steps+1)
 
-print("Plotting energy density field...")
 
-def update_energy_plot(frame_number, mesh, energy_field, ax):
+
+print("Plotting charge field...")
+
+def update_charge_plot(frame, mesh, rho, j, ax):
 	ax.cla()
-	ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c=energy_field[frame_number], cmap='jet')
+	ax.set_title("Charge field plot at step {} (t = {})".format(frame, T[frame]))
+	ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c=rho[frame], cmap='jet')
+	ax.quiver(mesh[:,0], mesh[:,1], mesh[:,2], j[frame][:,0], j[frame][:,1], j[frame][:,2], length=0.1, normalize=True)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
+animate = anim.FuncAnimation(fig, update_charge_plot, frames, fargs=(M, R, J, ax))
+#fig.colorbar(cm.ScalarMappable(norm=None, cmap='jet'), ax=ax)
+plt.show()
 
-frames = range(nb_steps+1)
-"""
-if (nb_steps+1 > max_frames):
-    frames = [int(i*nb_steps/max_frames) for i in range(max_frames+1)]
-"""
-animate = anim.FuncAnimation(fig, update_energy_plot, frames, fargs=(M, E, ax))
-fig.colorbar(cm.ScalarMappable(norm=None, cmap='jet'), ax=ax)
+
+
+print("Plotting electromagnetic field...")
+
+def update_electromagnetic_plot(frame, mesh, E, B, ax):
+	ax.cla()
+	ax.set_title("Electromagnetic field plot at step {} (t = {})".format(frame, T[frame]))
+	ax.quiver(mesh[:,0], mesh[:,1], mesh[:,2], E[frame][:,0], E[frame][:,1], E[frame][:,2], length=0.1, normalize=True)
+	ax.quiver(mesh[:,0], mesh[:,1], mesh[:,2], B[frame][:,0], B[frame][:,1], B[frame][:,2], length=0.1, normalize=True)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+animate = anim.FuncAnimation(fig, update_electromagnetic_plot, frames, fargs=(M, E, B, ax))
+#fig.colorbar(cm.ScalarMappable(norm=None, cmap='jet'), ax=ax)
+plt.show()
+
+
+
+print("Plotting energy density field...")
+
+def update_energy_plot(frame, mesh, energy, poynting, ax):
+	ax.cla()
+	ax.set_title("Energy field plot at step {} (t = {})".format(frame, T[frame]))
+	ax.scatter(mesh[:,0], mesh[:,1], mesh[:,2], c=energy[frame], cmap='jet')
+	ax.quiver(mesh[:,0], mesh[:,1], mesh[:,2], poynting[frame][:,0], poynting[frame][:,1], poynting[frame][:,2], length=0.1, normalize=True)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+animate = anim.FuncAnimation(fig, update_energy_plot, frames, fargs=(M, U, P, ax))
+#fig.colorbar(cm.ScalarMappable(norm=None, cmap='jet'), ax=ax)
 plt.show()
 
 

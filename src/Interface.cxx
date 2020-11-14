@@ -21,7 +21,8 @@ PYBIND11_MODULE(_maxwell, m)
 		.def(py::init<>())
 		.def("setConstants", &SimManager::set_constants,
 			py::arg("epsilon"),
-			py::arg("mu"))
+			py::arg("mu"),
+			py::arg("sigma"))
 		.def("setSimulationParameters", &SimManager::set_simulation_parameters,
 			py::arg("t_max"),
 			py::arg("nb_steps"),
@@ -48,6 +49,7 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("wire_current"))
 		.def("addBoundaryCondition", &SimManager::add_boundary_condition,
 			py::arg("node_nb"))
+		.def("lockAllBoundaryNodes", &SimManager::lock_all_boundary_nodes)
 		.def("simulate", &SimManager::simulate)
 		//.def("save", &SimManager::save,
 		//	py::arg("simulation_name"))
@@ -55,6 +57,15 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getNbCells", &SimManager::get_nb_cells)
 		.def("getNodeIds", &SimManager::get_node_ids)
 		.def("getMesh", &SimManager::get_mesh)
+		.def("getTime", &SimManager::get_time)
+		.def("getRho", &SimManager::get_rho,
+			py::arg("step"))
+		.def("getJ", &SimManager::get_j,
+			py::arg("step"))
+		.def("getE", &SimManager::get_E,
+			py::arg("step"))
+		.def("getB", &SimManager::get_B,
+			py::arg("step"))
 		.def("getEnergyDensity", &SimManager::get_energy_density,
 			py::arg("step"))
 		.def("getPoyntingVector", &SimManager::get_poynting_vector,

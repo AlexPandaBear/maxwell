@@ -7,7 +7,7 @@
 class UnsteadyMaxwellKernel
 {
 private:
-	const double m_eps, m_mu;
+	const double m_eps, m_mu, m_sigma;
 
 	const size_t m_nb_steps;
 	const double m_t_max;
@@ -21,14 +21,16 @@ private:
 	const Mesh3D& m_mesh;
 	DataKeeper& m_data;
 
-	SparseMatrix mat_A;
+	SparseMatrix mat_M, mat_A, mat_L, mat_R;
 	std::vector<double> vec_X, vec_B;
 
 	bool boundary_node(size_t node_nb) const;
 
 	bool check_divergence_in_ID() const;
 
-	void build_matrix_A();
+	void build_matrices();
+
+	void initialize_vector_X();
 	void build_vector_B(size_t t);
 
 	double GS_step(size_t i) const;

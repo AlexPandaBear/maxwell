@@ -3,7 +3,10 @@
 SimManager::SimManager() :
 	m_mesh(Mesh3D()),
 	m_data(DataKeeper()),
-	m_processor(DataProcessor(m_data)) {}
+	m_processor(DataProcessor(m_data)) 
+{
+	std::cout << "Creation of the simulation environment [ OK ]" << std::endl;
+}
 /*
 SimManager::SimManager(std::string simulation_name) :
 	m_mesh(Mesh3D(simulation_name + ".m")),
@@ -12,14 +15,21 @@ SimManager::SimManager(std::string simulation_name) :
 */
 SimManager::~SimManager() {}
 
-void SimManager::set_constants(double epsilon, double mu)
+void SimManager::set_constants(double epsilon, double mu, double sigma)
 {
+	std::cout << "Definition of the physical constants ";
+	
 	m_data.set_epsilon(epsilon);
 	m_data.set_mu(mu);
+	m_data.set_sigma(sigma);
+	
+	std::cout << "[ OK ]" << std::endl;
 }
 
 void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double theta, double accuracy, size_t max_nb_iterations, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max, size_t nx, size_t ny, size_t nz)
 {
+	std::cout << "Creation of the mesh and the time samples ";
+	
 	m_data.set_t_max(t_max);
 	m_data.set_theta(theta);
 	m_data.set_accuracy(accuracy);
@@ -28,21 +38,23 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	m_mesh.generate_grid_mesh(x_min, x_max, y_min, y_max, z_min, z_max, nx, ny, nz);
 	m_data.reset_dimensions(nb_steps, m_mesh.get_nb_nodes(), m_mesh.get_nb_cells());
 	m_data.erase_BCs();
+	
+	std::cout << "[ OK ]" << std::endl;
 }
 
 void SimManager::define_initial_state_background_values(double rho0, Vec3D j0, Vec3D E0, Vec3D B0)
 {
-	for (size_t c = 0; c < m_data.get_nb_cells(); c++)
-	{
-		m_data.set_rho(0, c, rho0);
-		m_data.set_j(0, c, j0);
-	}
-
+	std::cout << "Definition of the initial state ";
+	
 	for (size_t n = 0; n < m_data.get_nb_nodes(); n++)
 	{
+		m_data.set_rho(0, n, rho0);
+		m_data.set_j(0, n, j0);
 		m_data.set_E(0, n, E0);
 		m_data.set_B(0, n, B0);
 	}
+
+	std::cout << "[ OK ]" << std::endl;
 }
 
 double SimManager::generate_random_double(double min, double max) const
@@ -113,11 +125,27 @@ void SimManager::add_boundary_condition(size_t node_nb)
 	m_data.add_BC(node_nb);
 }
 
+void SimManager::lock_all_boundary_nodes()
+{
+	std::cout << "Locking as constant Dirichlet boundary conditions all the frontier ";
+
+	for (size_t n : m_mesh.get_boundary_nodes())
+	{
+		m_data.add_BC(n);
+	}
+
+	std::cout << "[ OK ]" << std::endl;
+}
+
 void SimManager::simulate()
 {
+	std::cout << "Creation of the kernel ";
 	UnsteadyMaxwellKernel kernel(m_mesh, m_data);
+	std::cout << "[ OK ]" << std::endl;
+
 	kernel.simulate();
 }
+
 /*
 void SimManager::save(std::string simulation_name) const
 {
@@ -145,6 +173,31 @@ std::vector<size_t> SimManager::get_node_ids(size_t cell_id) const
 VectorField const& SimManager::get_mesh()
 {
 	return m_mesh.get_all_nodes_xyz();
+}
+
+std::vector<double> const& SimManager::get_time()
+{
+	return m_data.get_time();
+}
+
+ScalarField const& SimManager::get_rho(size_t step)
+{
+	return m_data.get_rho(step);
+}
+
+VectorField const& SimManager::get_j(size_t step)
+{
+	return m_data.get_j(step);
+}
+
+VectorField const& SimManager::get_E(size_t step)
+{
+	return m_data.get_E(step);
+}
+
+VectorField const& SimManager::get_B(size_t step)
+{
+	return m_data.get_B(step);
 }
 
 ScalarField const& SimManager::get_energy_density(size_t step)
