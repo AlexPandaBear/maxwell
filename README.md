@@ -3,19 +3,7 @@
 This project is a Finite Elements Method (FEM) solver for Maxwell's equations.
 
 <p align="center">
-        <img src=eq_maxwell_gauss.png />
-</p>
-
-<p align="center">
-        <img src=eq_maxwell_faraday.png />
-</p>
-
-<p align="center">
-        <img src=eq_maxwell_thompson.png />
-</p>
-
-<p align="center">
-        <img src=eq_maxwell_ampere.png />
+        <img src=equations.png />
 </p>
 
 ## Requirements
