@@ -39,7 +39,7 @@ user@linux:~/path/to/code$ mkdir data
 user@linux:~/path/to/code$ mkdir results  
 ```
 
-Execute the following commands to compile the C++ library and generate the doc.
+Execute the following commands to compile the C++ library and generate the reference documentation which will be available in the doc/html folder (file index.html).
 ```console
 user@linux:~/path/to/code$ cd build  
 user@linux:~/path/to/code/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=$PWD/install    
@@ -48,7 +48,6 @@ user@linux:~/path/to/code/build$ make reference_doc
 ```
 
 ## How to use
-Execute these commands to get to the python directory and add the library to the PYTHONPATH.
 ```console
 user@linux:~/path/to/code$ cd python
 user@linux:~/path/to/code/python$ python simulation.py
