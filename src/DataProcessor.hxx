@@ -13,6 +13,7 @@ private:
 
 	std::vector<ScalarField> m_energy;
 	std::vector<VectorField> m_poynting;
+	std::vector<ScalarField> m_poynting_norm;
 
 	void compute_energy();
 	void compute_poynting();
@@ -24,4 +25,5 @@ public:
 
 	ScalarField const& get_energy_density(size_t step);
 	VectorField const& get_poynting_vector(size_t step);
+	ScalarField const& get_poynting_vector_norm(size_t step);
 };

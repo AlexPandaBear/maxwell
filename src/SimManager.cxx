@@ -42,6 +42,12 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	std::cout << "[ OK ]" << std::endl;
 }
 
+void SimManager::define_initial_state(VectorField const& E0, VectorField const& B0)
+{
+	m_data.set_E(0, E0);
+	m_data.set_B(0, B0);
+}
+
 void SimManager::define_initial_state_background_values(double rho0, Vec3D j0, Vec3D E0, Vec3D B0)
 {
 	std::cout << "Definition of the initial state ";
@@ -170,6 +176,11 @@ std::vector<size_t> SimManager::get_node_ids(size_t cell_id) const
 	return {cell.get_global_node_id(0), cell.get_global_node_id(1), cell.get_global_node_id(2), cell.get_global_node_id(3)};
 }
 
+Vec3D SimManager::get_node_xyz(size_t node_id) const
+{
+	return m_mesh.get_node_xyz(node_id);
+}
+
 VectorField const& SimManager::get_mesh()
 {
 	return m_mesh.get_all_nodes_xyz();
@@ -208,4 +219,9 @@ ScalarField const& SimManager::get_energy_density(size_t step)
 VectorField const& SimManager::get_poynting_vector(size_t step)
 {
 	return m_processor.get_poynting_vector(step);
+}
+
+ScalarField const& SimManager::get_poynting_vector_norm(size_t step)
+{
+	return m_processor.get_poynting_vector_norm(step);
 }

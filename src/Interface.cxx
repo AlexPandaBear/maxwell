@@ -2,8 +2,8 @@
 <%
 setup_pybind11(cfg)
 cfg['compiler_args'] = ['-std=c++11', '-I/usr/local/lib/python3.7/dist-packages/pybind11-2.4.3-py3.7.egg/']
-cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'SparseMatrix.hxx', 'Mesh3D.hxx', 'Cell.hxx', 'DataKeeper.hxx', 'DataProcessor.hxx', 'Vec3D.hxx', 'ScalarField.hxx', 'VectorField.hxx']
-cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'SparseMatrix.cxx', 'Mesh3D.cxx', 'Cell.cxx', 'DataKeeper.cxx', 'DataProcessor.cxx', 'Vec3D.cxx', 'ScalarField.cxx', 'VectorField.cxx']
+cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'Mesh3D.hxx', 'Cell.hxx', 'DataKeeper.hxx', 'DataProcessor.hxx', 'Vec3D.hxx', 'ScalarField.hxx', 'VectorField.hxx', 'Matrix.hxx', 'MatrixFEM.hxx']
+cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'Mesh3D.cxx', 'Cell.cxx', 'DataKeeper.cxx', 'DataProcessor.cxx', 'Vec3D.cxx', 'ScalarField.cxx', 'VectorField.cxx', 'Matrix.cxx', 'MatrixFEM.cxx']
 %>
 */
 
@@ -38,6 +38,9 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("nx"),
 			py::arg("ny"),
 			py::arg("nz"))
+		.def("defineInitialState", &SimManager::define_initial_state,
+			py::arg("E0"),
+			py::arg("B0"))
 		.def("defineInitialStateBackgroundValues", &SimManager::define_initial_state_background_values,
 			py::arg("rho0"),
 			py::arg("j0"),
@@ -56,6 +59,8 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getNbNodes", &SimManager::get_nb_nodes)
 		.def("getNbCells", &SimManager::get_nb_cells)
 		.def("getNodeIds", &SimManager::get_node_ids)
+		.def("getNodeXYZ", &SimManager::get_node_xyz,
+			py::arg("node_nb"))
 		.def("getMesh", &SimManager::get_mesh)
 		.def("getTime", &SimManager::get_time)
 		.def("getRho", &SimManager::get_rho,
@@ -69,6 +74,8 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getEnergyDensity", &SimManager::get_energy_density,
 			py::arg("step"))
 		.def("getPoyntingVector", &SimManager::get_poynting_vector,
+			py::arg("step"))
+		.def("getPoyntingVectorNorm", &SimManager::get_poynting_vector_norm,
 			py::arg("step"));
 
 	py::class_<Vec3D>(m, "Vec3D")
@@ -105,8 +112,13 @@ PYBIND11_MODULE(_maxwell, m)
 			});
 
 	py::class_<VectorField>(m, "VectorField", py::buffer_protocol())
+		.def(py::init<size_t>(),
+			py::arg("nb_nodes"))
 		.def("getVector", &VectorField::get_value,
 			py::arg("node_nb"))
+		.def("setVector", py::overload_cast<size_t, Vec3D>(&VectorField::set_value),
+			py::arg("node_nb"),
+			py::arg("vector"))
 		.def_buffer([](VectorField& f) -> py::buffer_info
 			{
 				return py::buffer_info(

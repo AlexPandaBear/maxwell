@@ -5,7 +5,8 @@ DataProcessor::DataProcessor(DataKeeper& data) :
 	m_energy_ready(false),
 	m_poynting_ready(false),
 	m_energy(std::vector<ScalarField>(0, ScalarField(0))),
-	m_poynting(std::vector<VectorField>(0, VectorField(0))) {}
+	m_poynting(std::vector<VectorField>(0, VectorField(0))),
+	m_poynting_norm(std::vector<ScalarField>(0, ScalarField(0))) {}
 
 DataProcessor::~DataProcessor() {}
 
@@ -38,12 +39,17 @@ void DataProcessor::compute_poynting()
 	double inv_mu(1. / m_data.get_mu());
 
 	m_poynting = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
+	m_poynting_norm = std::vector<ScalarField>(nb_steps+1, ScalarField(nb_nodes));
+
+	Vec3D Pi;
 
 	for (size_t t = 0; t < nb_steps+1; t++)
 	{
 		for (size_t n = 0; n < nb_nodes; n++)
 		{
-			m_poynting[t].set_value(n, Vec3D::cross_product(m_data.get_E(t, n), m_data.get_B(t, n)) * inv_mu);
+			Pi = Vec3D::cross_product(m_data.get_E(t, n), m_data.get_B(t, n)) * inv_mu;
+			m_poynting[t].set_value(n, Pi);
+			m_poynting_norm[t].set_value(n, Pi.compute_norm());
 		}
 	}
 
@@ -73,4 +79,14 @@ VectorField const& DataProcessor::get_poynting_vector(size_t step)
 	}
 
 	return m_poynting[step];
+}
+
+ScalarField const& DataProcessor::get_poynting_vector_norm(size_t step)
+{
+	if (!m_poynting_ready)
+	{
+		compute_poynting();
+	}
+
+	return m_poynting_norm[step];
 }

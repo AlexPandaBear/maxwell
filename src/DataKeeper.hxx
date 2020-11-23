@@ -73,11 +73,13 @@ public:
 	Vec3D get_E(size_t t, size_t node_nb);
 	VectorField const& get_E(size_t step) const;
 	void set_E(size_t t, size_t node_nb, Vec3D E);
+	void set_E(size_t t, VectorField const& E);
 	
 	Vec3D get_B(size_t t, size_t node_nb);
 	VectorField const& get_B(size_t step) const;
 	void set_B(size_t t, size_t node_nb, Vec3D B);
-	
+	void set_B(size_t t, VectorField const& B);
+
 	void erase_BCs();
 	void add_BC(size_t node_nb);
 	Vec3D get_boundary_condition_E(size_t node_nb);

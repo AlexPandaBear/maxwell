@@ -47,6 +47,7 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	m_cells = std::vector<Cell>(m_nb_cells, Cell(m_nodes_xyz, 0, 0, 0, 0));
 	id = 0;
 
+
 	for (size_t i = 0; i < nx-1; i++)
 	{
 		for (size_t j = 0; j < ny-1; j++)
@@ -54,15 +55,27 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 			for (size_t k = 0; k < nz-1; k++)
 			{
 				m_cells[id].set_nodes_id(i*ny*nz + j*nz + k, i*ny*nz + j*nz + k+1, i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + j*nz + k);
+				if (k == 0) {m_cells[id].set_boundary_face(1);}
+				if (j == 0) {m_cells[id].set_boundary_face(2);}
+				if (i == 0) {m_cells[id].set_boundary_face(3);}
 				id++;
 
 				m_cells[id].set_nodes_id(i*ny*nz + j*nz + k+1, i*ny*nz + (j+1)*nz + k+1, i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + (j+1)*nz + k+1);
+				if (k == nz-2) {m_cells[id].set_boundary_face(2);}
+				if (j == ny-2) {m_cells[id].set_boundary_face(0);}
+				if (i == 0) {m_cells[id].set_boundary_face(3);}
 				id++;
 
 				m_cells[id].set_nodes_id(i*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + j*nz + k, (i+1)*ny*nz + (j+1)*nz + k, (i+1)*ny*nz + (j+1)*nz + k+1);
+				if (k == 0) {m_cells[id].set_boundary_face(3);}
+				if (j == ny-2) {m_cells[id].set_boundary_face(1);}
+				if (i == nx-2) {m_cells[id].set_boundary_face(0);}
 				id++;
 
 				m_cells[id].set_nodes_id((i+1)*ny*nz + j*nz + k, i*ny*nz + j*nz + k+1, (i+1)*ny*nz + j*nz + (k+1), (i+1)*ny*nz + (j+1)*nz + k+1);
+				if (k == nz-2) {m_cells[id].set_boundary_face(0);}
+				if (j == 0) {m_cells[id].set_boundary_face(3);}
+				if (i == nx-2) {m_cells[id].set_boundary_face(1);}
 				id++;
 
 				m_cells[id].set_nodes_id((i+1)*ny*nz + j*nz + k, i*ny*nz + (j+1)*nz + k, i*ny*nz + j*nz + (k+1), (i+1)*ny*nz + (j+1)*nz + k+1);
@@ -70,6 +83,20 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 			}
 		}
 	}
+}
+
+void Mesh3D::generate_smooth_mesh(double x_min, double x_max, double y_min, double y_max, double z_min, double z_max, size_t nx, size_t ny, size_t nz)
+{
+	if (nx % 2 == 0 or ny % 2 == 0 or nz % 2 == 0)
+	{
+		std::cout << "Warning : bad mesh !" << std::endl;
+	}
+
+	double dx((x_max-x_min)/(nx-1));
+	double dy((y_max-y_min)/(ny-1));
+	double dz((z_max-z_min)/(nz-1));
+
+	//TODO
 }
 
 size_t Mesh3D::get_nb_nodes() const
@@ -82,7 +109,7 @@ size_t Mesh3D::get_nb_cells() const
 	return m_nb_cells;
 }
 
-Vec3D Mesh3D::get_node_xyz(size_t node_id)
+Vec3D Mesh3D::get_node_xyz(size_t node_id) const
 {
 	return m_nodes_xyz.get_value(node_id);
 }

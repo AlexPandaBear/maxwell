@@ -182,6 +182,14 @@ void DataKeeper::set_E(size_t t, size_t node_nb, Vec3D E)
 	m_E[t].set_value(node_nb, E);
 }
 
+void DataKeeper::set_E(size_t t, VectorField const& E)
+{
+	for (size_t n = 0; n < m_nb_nodes; n++)
+	{
+		m_E[t].set_value(n, E.get_value(n));
+	}
+}
+
 Vec3D DataKeeper::get_B(size_t t, size_t node_nb)
 {
 	return m_B[t].get_value(node_nb);
@@ -195,6 +203,14 @@ VectorField const& DataKeeper::get_B(size_t step) const
 void DataKeeper::set_B(size_t t, size_t node_nb, Vec3D B)
 {
 	m_B[t].set_value(node_nb, B);
+}
+
+void DataKeeper::set_B(size_t t, VectorField const& B)
+{
+	for (size_t n = 0; n < m_nb_nodes; n++)
+	{
+		m_B[t].set_value(n, B.get_value(n));
+	}
 }
 
 void DataKeeper::erase_BCs()

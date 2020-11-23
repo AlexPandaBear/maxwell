@@ -8,7 +8,11 @@ Cell::Cell(VectorField const& nodes, size_t N0_id, size_t N1_id, size_t N2_id, s
 	m_N0_id(N0_id),
 	m_N1_id(N1_id),
 	m_N2_id(N2_id),
-	m_N3_id(N3_id)
+	m_N3_id(N3_id),
+	m_boundary_0(false),
+	m_boundary_1(false),
+	m_boundary_2(false),
+	m_boundary_3(false)
 {
 	compute_nodes();
 }
@@ -18,7 +22,11 @@ Cell::Cell(Cell const& cell) :
 	m_N0_id(cell.get_global_node_id(0)),
 	m_N1_id(cell.get_global_node_id(1)),
 	m_N2_id(cell.get_global_node_id(2)),
-	m_N3_id(cell.get_global_node_id(3))
+	m_N3_id(cell.get_global_node_id(3)),
+	m_boundary_0(false),
+	m_boundary_1(false),
+	m_boundary_2(false),
+	m_boundary_3(false)
 {
 	compute_nodes();
 }
@@ -110,12 +118,24 @@ Vec3D Cell::get_node_xyz(size_t local_node_id) const
 		default: throw std::invalid_argument("Invalid local node number");
 	}
 }
-/*
-void Cell::set_nodes_ref(VectorField const& nodes)
+
+void Cell::set_boundary_face(size_t opposite_node_local_id)
 {
-	m_nodes_ref = nodes;
+	switch (opposite_node_local_id)
+	{
+		case 0: m_boundary_0 = true; return;
+		case 1: m_boundary_1 = true; return;
+		case 2: m_boundary_2 = true; return;
+		case 3: m_boundary_3 = true; return;
+		default: throw std::invalid_argument("Invalid local node number -- prout");
+	}
 }
-*/
+
+bool Cell::is_boundary_cell() const
+{
+	return (m_boundary_0 or m_boundary_1 or m_boundary_2 or m_boundary_3);
+}
+
 VectorField const& Cell::get_nodes_ref() const
 {
 	return m_nodes_ref;
@@ -147,51 +167,59 @@ Vec3D Cell::get_surface(size_t opposite_node_local_id) const
 		default: throw std::invalid_argument("Invalid local node number");
 	}
 }
-/*
-double Cell::get_ddx_lamb(size_t local_node_id) const
+
+double Cell::compute_int3d_phi_psi(size_t i, size_t j) const
 {
-	switch (local_node_id)
+	if (i == j)
 	{
-		case 0: return m_ddx_lamb0;
-		case 1: return m_ddx_lamb1;
-		case 2: return m_ddx_lamb2;
-		case 3: return m_ddx_lamb3;
-		default: throw std::invalid_argument("Invalid local node number");
+		return m_w * (m_b*m_b + 3.*m_a*m_a) * m_volume;
 	}
+
+	return 2. * m_w * m_a * (m_a+m_b) * m_volume;
 }
 
-double Cell::get_ddy_lamb(size_t local_node_id) const
+Vec3D Cell::compute_int3d_phi_grad_psi(size_t i) const
 {
-	switch (local_node_id)
-	{
-		case 0: return m_ddy_lamb0;
-		case 1: return m_ddy_lamb1;
-		case 2: return m_ddy_lamb2;
-		case 3: return m_ddy_lamb3;
-		default: throw std::invalid_argument("Invalid local node number");
-	}
+	return get_surface(i) / (-12.);
 }
 
-double Cell::get_ddz_lamb(size_t local_node_id) const
+Vec3D Cell::compute_int2d_phi_psi_n(size_t i, size_t j) const
 {
-	switch (local_node_id)
+	Vec3D S(0., 0., 0.);
+
+	if (!is_boundary_cell())
 	{
-		case 0: return m_ddz_lamb0;
-		case 1: return m_ddz_lamb1;
-		case 2: return m_ddz_lamb2;
-		case 3: return m_ddz_lamb3;
-		default: throw std::invalid_argument("Invalid local node number");
+		return S;
 	}
+
+	if (m_boundary_0 and i != 0 and j != 0)
+	{
+		S += m_S_123 / 12.;
+	}
+
+	if (m_boundary_1 and i != 1 and j != 1)
+	{
+		S += m_S_023 / 12.;
+	}
+
+	if (m_boundary_2 and i != 2 and j != 2)
+	{
+		S += m_S_013 / 12.;
+	}
+
+	if (m_boundary_3 and i != 3 and j != 3)
+	{
+		S += m_S_012 / 12.;
+	}
+
+	if (i != j)
+	{
+		S /= 2.;
+	}
+
+	return S;
 }
 
-void Cell::display() const
-{
-	m_N0.display();
-	m_N1.display();
-	m_N2.display();
-	m_N3.display();
-}
-*/
 Cell Cell::operator=(Cell const& cell)
 {
 	Cell copy(cell);

@@ -15,7 +15,7 @@ if ( "${isSystemDir}" STREQUAL "-1" )
 endif ( "${isSystemDir}" STREQUAL "-1" )
 
 
-add_library ( maxwell SHARED SimManager.cxx UnsteadyMaxwellKernel.cxx SparseMatrix.cxx Mesh3D.cxx Cell.cxx DataKeeper.cxx DataProcessor.cxx Vec3D.cxx ScalarField.cxx VectorField.cxx )
+add_library ( maxwell SHARED SimManager.cxx UnsteadyMaxwellKernel.cxx Mesh3D.cxx Cell.cxx DataKeeper.cxx DataProcessor.cxx Vec3D.cxx ScalarField.cxx VectorField.cxx Matrix.cxx MatrixFEM.cxx )
 install (
   TARGETS maxwell
   LIBRARY DESTINATION lib
