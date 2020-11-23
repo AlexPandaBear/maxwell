@@ -5,6 +5,7 @@
 #include <utility>
 #include <memory>
 #include <stdexcept>
+#include <tbb/parallel_for.h>
 
 class Matrix
 {

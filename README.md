@@ -11,6 +11,7 @@ To compile the library :
 - CMake  
 - A C++ compiler  
 - The PyBind11 library  
+- The Intel Threading Building Blocks (TBB) library
 
 To generate the reference documentation :
 - Doxygen  
@@ -19,8 +20,12 @@ To use it with Python :
 - Python 3+  
 - The Numpy and Matplotlib libraries  
 
+NB: The TBB library is not included in this repository, but can be found here:  
+https://github.com/oneapi-src/oneTBB
+
 ## How to install
-Go to the code directory and execute the following commands to create a build directory to compile the library, a data directory to store the raw simulation outputs, and a results directory to save the postprocessed results.
+First, make sure that the TBB library is installed next this folder. If the library is installed elsewhere, the path to the library in the src/CMakeLists.txt file will have to be changed.  
+Then, go to the code directory and execute the following commands to create a build directory to compile the library, a data directory to store the raw simulation outputs, and a results directory to save the postprocessed results.
 ```console
 user@linux:~/path/to/code$ mkdir build  
 user@linux:~/path/to/code$ mkdir data  

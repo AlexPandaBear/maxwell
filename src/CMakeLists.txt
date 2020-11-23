@@ -15,11 +15,17 @@ if ( "${isSystemDir}" STREQUAL "-1" )
 endif ( "${isSystemDir}" STREQUAL "-1" )
 
 
+include_directories(${CMAKE_SOURCE_DIR}/../../TBB/include)
+link_directories(${CMAKE_SOURCE_DIR}/../../TBB/build/linux_intel64_gcc_cc8.3.0_libc2.28_kernel4.19.0_release)
+
+
 add_library ( maxwell SHARED SimManager.cxx UnsteadyMaxwellKernel.cxx Mesh3D.cxx Cell.cxx DataKeeper.cxx DataProcessor.cxx Vec3D.cxx ScalarField.cxx VectorField.cxx Matrix.cxx MatrixFEM.cxx )
 install (
   TARGETS maxwell
   LIBRARY DESTINATION lib
   )
+
+target_link_libraries(maxwell tbb)
 
 
 find_program ( DOXYGEN_EXECUTABLE

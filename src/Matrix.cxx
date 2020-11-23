@@ -77,7 +77,9 @@ void Matrix::perform_matrix_vector_product(std::vector<double> const& V, std::ve
 		throw std::invalid_argument("Vectors sizes don't agree with matrix shape");
 	}
 
-	for (size_t k = 0; k < m_nb_rows; k++)
+
+	tbb::parallel_for((size_t) 0, m_nb_rows, [&](size_t k)
+	//for (size_t k = 0; k < m_nb_rows; k++)
 	{
 		R[k] = 0.;
 
@@ -86,6 +88,7 @@ void Matrix::perform_matrix_vector_product(std::vector<double> const& V, std::ve
 			R[k] += get_coef(k,i)*V[i];
 		}
 	}
+	);
 }
 
 double Matrix::perform_gauss_seidel_iteration(std::vector<double>& X, std::vector<double> const& B) const
