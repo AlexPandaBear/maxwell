@@ -24,15 +24,16 @@ NB: The TBB library is not included in this repository, but can be found here:
 https://github.com/oneapi-src/oneTBB
 
 ## How to install
-First, make sure that the TBB library is installed next this folder. If the library is installed elsewhere, the path to the library in the src/CMakeLists.txt file will have to be changed.  
-Then, go to the code directory and execute the following commands to create a build directory to compile the library, a data directory to store the raw simulation outputs, and a results directory to save the postprocessed results.
+1. Make sure that the TBB library is installed next this folder. If the library is installed elsewhere, the path to the library in the src/CMakeLists.txt file will have to be changed.  
+
+2. Go to the code directory and execute the following commands to create a build directory to compile the library, a data directory to store the raw simulation outputs, and a results directory to save the postprocessed results.
 ```console
 user@linux:~/path/to/code$ mkdir build  
 user@linux:~/path/to/code$ mkdir data  
 user@linux:~/path/to/code$ mkdir results  
 ```
 
-Execute the following commands to compile the C++ library and generate the reference documentation which will be available in the doc/html folder (file index.html).
+3. Execute the following commands to compile the C++ library and generate the reference documentation which will be available in the doc/html folder (file index.html).
 ```console
 user@linux:~/path/to/code$ cd build  
 user@linux:~/path/to/code/build$ cmake ../src -DCMAKE_INSTALL_PREFIX=$PWD/install    
