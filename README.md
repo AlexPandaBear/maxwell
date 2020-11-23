@@ -30,12 +30,23 @@ user@linux:~/path$ tree
 .  
 +-- maxwell  
 |   +-- doc
-|   +-- pyton
-|   +-- src  
+|   |   +-- ...
+|   |
+|   +-- python
+|   |   +-- ...
+|   |
+|   +-- src
+|   |   +-- ...
+|   |
+|   +-- equations.png  
+|   +-- README.md  
+|
 +-- TBB
 |   +-- build  
-|   +-- cmake  
-|   +-- doc
+|   |   +-- ...
+|   |
+|   +-- cmake
+|   |   +-- ...
 |   ...  
 ```
 
