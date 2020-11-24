@@ -13,11 +13,20 @@ private:
 
 public:
 	/**
-	 * The constructor of the class
+	 * A constructor of the class creating a nil field
 	 *
 	 * @param nb_nodes The number of nodes of the field
 	 */
 	ScalarField(size_t nb_nodes);
+
+	/**
+	 * A constructor of the class creating an instance already filled with an uniform value
+	 *
+	 * @param nb_nodes The number of nodes of the field
+	 *
+	 * @param value The uniform value of the field
+	 */
+	ScalarField(size_t nb_nodes, double value);
 
 	/**
 	 * The destructor of the class

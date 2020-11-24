@@ -2,8 +2,8 @@
 <%
 setup_pybind11(cfg)
 cfg['compiler_args'] = ['-std=c++11', '-I/usr/local/lib/python3.7/dist-packages/pybind11-2.4.3-py3.7.egg/']
-cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'Mesh3D.hxx', 'Cell.hxx', 'DataKeeper.hxx', 'DataProcessor.hxx', 'Vec3D.hxx', 'ScalarField.hxx', 'VectorField.hxx', 'Matrix.hxx', 'MatrixFEM.hxx']
-cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'Mesh3D.cxx', 'Cell.cxx', 'DataKeeper.cxx', 'DataProcessor.cxx', 'Vec3D.cxx', 'ScalarField.cxx', 'VectorField.cxx', 'Matrix.cxx', 'MatrixFEM.cxx']
+cfg['dependencies'] = ['SimManager.hxx', 'UnsteadyMaxwellKernel.hxx', 'Mesh3D.hxx', 'Cell.hxx', 'DataKeeper.hxx', 'DataProcessor.hxx', 'Vec3D.hxx', 'ScalarField.hxx', 'VectorField.hxx', 'Matrix.hxx', 'MatrixFEM.hxx', 'ElectrostaticSimManager.hxx', 'ElectrostaticKernel.hxx', 'ElectrostaticDataKeeper.hxx']
+cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'Mesh3D.cxx', 'Cell.cxx', 'DataKeeper.cxx', 'DataProcessor.cxx', 'Vec3D.cxx', 'ScalarField.cxx', 'VectorField.cxx', 'Matrix.cxx', 'MatrixFEM.cxx', 'ElectrostaticSimManager.cxx', 'ElectrostaticKernel.cxx', 'ElectrostaticDataKeeper.cxx']
 %>
 */
 
@@ -11,6 +11,7 @@ cfg['sources'] = ['SimManager.cxx', 'UnsteadyMaxwellKernel.cxx', 'Mesh3D.cxx', '
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include "SimManager.hxx"
+#include "ElectrostaticSimManager.hxx"
 #include "Vec3D.hxx"
 
 namespace py = pybind11;
@@ -78,6 +79,37 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getPoyntingVectorNorm", &SimManager::get_poynting_vector_norm,
 			py::arg("step"));
 
+	py::class_<ElectrostaticSimManager>(m, "ESM")
+		.def(py::init<>())
+		.def("setEpsilon0", &ElectrostaticSimManager::set_epsilon0,
+			py::arg("epsilon0"))
+		.def("setAccuracy", &ElectrostaticSimManager::set_accuracy,
+			py::arg("accuracy"))
+		.def("setMaxNbIterations", &ElectrostaticSimManager::set_max_nb_iterations,
+			py::arg("max_nb_iterations"))
+		.def("generateCubeMesh", &ElectrostaticSimManager::generate_cube_mesh,
+			py::arg("x_min"),
+			py::arg("x_max"),
+			py::arg("nx"),
+			py::arg("y_min"),
+			py::arg("y_max"),
+			py::arg("ny"),
+			py::arg("z_min"),
+			py::arg("z_max"),
+			py::arg("nz"))
+		.def("defineRhoField", &ElectrostaticSimManager::define_rho_field,
+			py::arg("rho_field"))
+		.def("defineEpsilonRField", &ElectrostaticSimManager::define_epsilon_r_field,
+			py::arg("epsilon_r_field"))
+		.def("simulate", &ElectrostaticSimManager::simulate)
+		.def("getNbNodes", &ElectrostaticSimManager::get_nb_nodes)
+		.def("getNodeXYZ", &ElectrostaticSimManager::get_node_xyz,
+			py::arg("node_id"))
+		.def("getMesh", &ElectrostaticSimManager::get_mesh)
+		.def("getRho", &ElectrostaticSimManager::get_rho)
+		.def("getEpsilon", &ElectrostaticSimManager::get_epsilon)
+		.def("getE", &ElectrostaticSimManager::get_E);
+
 	py::class_<Vec3D>(m, "Vec3D")
 		.def(py::init<>())
 		.def(py::init<double, double, double>(),
@@ -99,6 +131,16 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("z"));
 
 	py::class_<ScalarField>(m, "ScalarField", py::buffer_protocol())
+		.def(py::init<size_t>(),
+			py::arg("nb_nodes"))
+		.def(py::init<size_t, double>(),
+			py::arg("node_nb"),
+			py::arg("value"))
+		.def("getValue", &ScalarField::get_value,
+			py::arg("node_nb"))
+		.def("setValue", &ScalarField::set_value,
+			py::arg("node_nb"),
+			py::arg("value"))
 		.def_buffer([](ScalarField& f) -> py::buffer_info
 			{
 				return py::buffer_info(

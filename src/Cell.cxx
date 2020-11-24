@@ -178,6 +178,11 @@ double Cell::compute_int3d_phi_psi(size_t i, size_t j) const
 	return 2. * m_w * m_a * (m_a+m_b) * m_volume;
 }
 
+double Cell::compute_int3d_grad_phi_grad_psi(size_t i, size_t j) const
+{
+	return Vec3D::dot_product(get_surface(i), get_surface(j)) / (9.*m_volume);
+}
+
 Vec3D Cell::compute_int3d_phi_grad_psi(size_t i) const
 {
 	return get_surface(i) / (-12.);

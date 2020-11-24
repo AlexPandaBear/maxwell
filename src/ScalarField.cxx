@@ -2,7 +2,11 @@
 
 ScalarField::ScalarField(size_t nb_nodes) :
 	m_nb_nodes(nb_nodes),
-	m_values(std::vector<double>(nb_nodes)) {}
+	m_values(std::vector<double>(nb_nodes, 0.)) {}
+
+ScalarField::ScalarField(size_t nb_nodes, double value) :
+	m_nb_nodes(nb_nodes),
+	m_values(std::vector<double>(nb_nodes, value)) {}
 
 ScalarField::~ScalarField() {}
 

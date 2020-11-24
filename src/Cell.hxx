@@ -42,6 +42,7 @@ public:
 	Vec3D get_surface(size_t opposite_node_local_id) const;
 
 	double compute_int3d_phi_psi(size_t i, size_t j) const;
+	double compute_int3d_grad_phi_grad_psi(size_t i, size_t j) const;
 	Vec3D compute_int3d_phi_grad_psi(size_t i) const;
 	Vec3D compute_int2d_phi_psi_n(size_t i, size_t j) const;
 	
