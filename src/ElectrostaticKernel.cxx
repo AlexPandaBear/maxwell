@@ -1,6 +1,7 @@
 #include "ElectrostaticKernel.hxx"
 
-ElectrostaticKernel::ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data) :
+ElectrostaticKernel::ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data, bool verbose) :
+	m_verbose(verbose),
 	m_mesh(mesh),
 	m_data(data),
 	mat_A(data.get_nb_nodes()),
@@ -11,6 +12,11 @@ ElectrostaticKernel::~ElectrostaticKernel() {}
 
 void ElectrostaticKernel::build_matrix_A()
 {
+	if (m_verbose)
+	{
+		std::cout << "Building the left hand side matrix ";
+	}
+
 	size_t node_ids[4];
 	const Cell* ptr_cell;
 
@@ -27,14 +33,31 @@ void ElectrostaticKernel::build_matrix_A()
 		{
 			for (size_t j = 0; j < 4; j++)
 			{
-				mat_A.set_coef(node_ids[i], node_ids[j], ptr_cell->compute_int3d_grad_phi_grad_psi(i, j));
+				mat_A.add_to_coef(node_ids[i], node_ids[j], ptr_cell->compute_int3d_grad_phi_grad_psi(i, j));
 			}
 		}
+	}
+
+	mat_A.set_coef(0, 0, 1.);
+
+	for (size_t j = 1; j < m_data.get_nb_nodes(); j++)
+	{
+		mat_A.set_coef(0, j, 0.);
+	}
+
+	if (m_verbose)
+	{
+		std::cout << "[ OK ]" << std::endl;
 	}
 }
 
 void ElectrostaticKernel::build_vector_B()
 {
+	if (m_verbose)
+	{
+		std::cout << "Building of the right hand side vector ";
+	}
+
 	size_t node_ids[4];
 	const Cell* ptr_cell;
 
@@ -56,6 +79,11 @@ void ElectrostaticKernel::build_vector_B()
 			}
 		}
 	}
+
+	if (m_verbose)
+	{
+		std::cout << "[ OK ]" << std::endl;
+	}
 }
 
 void ElectrostaticKernel::simulate_phi()
@@ -64,26 +92,53 @@ void ElectrostaticKernel::simulate_phi()
 	const double accuracy(m_data.get_accuracy());
 
 	build_matrix_A();
+	//mat_A.display();
 	build_vector_B();
 
 	double residual;
 	size_t it(0);
 
+	if (m_verbose)
+	{
+		std::cout.precision(3);
+		std::cout << "Solving for the electric potential..." << std::endl;
+	}
+
 	do
 	{
 		residual = mat_A.perform_gauss_seidel_iteration(vec_X, vec_B);
 		it++;
+
+		if (m_verbose)
+		{
+			std::cout << "\r  iteration #" << it << " -- residual = " << residual << " (target = " << accuracy << ") " << std::flush;
+		}
 	}
 	while (residual > accuracy and it < max_nb_iterations);
 
 	if (it == max_nb_iterations and residual > accuracy)
 	{
+		if (m_verbose)
+		{
+			std::cout << "[ FAILED ]        " << std::endl;
+		}
+
 		throw std::runtime_error("Maximum number of iterations reached before convergence");
+	}
+
+	if (m_verbose)
+	{
+		std::cout << "[ OK ]        " << std::endl;
 	}
 }
 
 void ElectrostaticKernel::derive_E()
 {
+	if (m_verbose)
+	{
+		std::cout << "Computating the electric field ";
+	}
+
 	size_t node_ids[4];
 	const Cell* ptr_cell;
 	Vec3D E_cell;
@@ -121,5 +176,10 @@ void ElectrostaticKernel::derive_E()
 		}
 
 		m_data.set_E(n, m_data.get_E(n)/volume);
+	}
+
+	if (m_verbose)
+	{
+		std::cout << "[ OK ]" << std::endl;
 	}
 }

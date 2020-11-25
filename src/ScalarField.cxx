@@ -11,15 +11,15 @@ ScalarField::ScalarField(size_t nb_nodes, double value) :
 ScalarField::~ScalarField() {}
 
 void ScalarField::reset_nb_nodes(size_t nb_nodes)
-	{
-		m_nb_nodes = nb_nodes;
-		m_values = std::vector<double>(nb_nodes);
-	}
+{
+	m_nb_nodes = nb_nodes;
+	m_values = std::vector<double>(nb_nodes);
+}
 
 size_t ScalarField::get_nb_nodes() const
-	{
-		return m_nb_nodes;
-	}
+{
+	return m_nb_nodes;
+}
 
 void ScalarField::set_value(size_t node_nb, double value)
 {

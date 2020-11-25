@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include <iostream>
 #include <stdexcept>
 #include <tbb/parallel_for.h>
 
@@ -34,4 +35,6 @@ public:
 
 	void perform_matrix_vector_product(std::vector<double> const& V, std::vector<double>& R) const;
 	double perform_gauss_seidel_iteration(std::vector<double>& X, std::vector<double> const& B) const;
+
+	void display() const;
 };

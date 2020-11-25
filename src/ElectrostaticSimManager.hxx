@@ -5,11 +5,13 @@
 class ElectrostaticSimManager
 {
 private:
+	const bool m_verbose;
+
 	Mesh3D m_mesh;
 	ElectrostaticDataKeeper m_data;
 
 public:
-	ElectrostaticSimManager();
+	ElectrostaticSimManager(bool verbose = true);
 	~ElectrostaticSimManager();
 
 	void set_epsilon0(double epsilon0);
@@ -20,8 +22,10 @@ public:
 							double y_min, double y_max, size_t ny,
 							double z_min, double z_max, size_t nz);
 
-	void define_rho_field(ScalarField const& rho);
-	void define_epsilon_r_field(ScalarField const& epsilon_r);
+	void set_rho(size_t node_id, double rho);
+
+	void set_rho_field(ScalarField const& rho);
+	void set_epsilon_r_field(ScalarField const& epsilon_r);
 
 	void simulate();
 

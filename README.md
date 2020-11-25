@@ -6,6 +6,8 @@ This project is a Finite Elements Method (FEM) solver for Maxwell's equations.
         <img src=equations.png />
 </p>
 
+At the time, this library provides an unsteady solver computing all of the physics of the equations and an electrostatic solver computing steady solutions of the Maxwell-Gauss equation.
+
 ## Requirements
 To compile the library :
 - CMake  
@@ -20,7 +22,8 @@ To use it with Python :
 - Python 3+  
 - The Numpy and Matplotlib libraries  
 
-NB: The TBB library is not included in this repository, but can be found here:  
+NB: The PyBind11 and TBB libraries are not included in this repository, but can be found here:
+https://github.com/pybind/pybind11
 https://github.com/oneapi-src/oneTBB
 
 ## How to install

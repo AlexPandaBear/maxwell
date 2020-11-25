@@ -8,6 +8,8 @@
 class ElectrostaticKernel
 {
 private:
+	const bool m_verbose;
+
 	const Mesh3D& m_mesh;
 	ElectrostaticDataKeeper& m_data;
 
@@ -18,7 +20,7 @@ private:
 	void build_vector_B();
 
 public:
-	ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data);
+	ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data, bool verbose);
 	~ElectrostaticKernel();
 
 	void simulate_phi();

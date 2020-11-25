@@ -80,7 +80,8 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("step"));
 
 	py::class_<ElectrostaticSimManager>(m, "ESM")
-		.def(py::init<>())
+		.def(py::init<bool>(),
+			py::arg("verbose") = true)
 		.def("setEpsilon0", &ElectrostaticSimManager::set_epsilon0,
 			py::arg("epsilon0"))
 		.def("setAccuracy", &ElectrostaticSimManager::set_accuracy,
@@ -97,9 +98,12 @@ PYBIND11_MODULE(_maxwell, m)
 			py::arg("z_min"),
 			py::arg("z_max"),
 			py::arg("nz"))
-		.def("defineRhoField", &ElectrostaticSimManager::define_rho_field,
+		.def("setRho", &ElectrostaticSimManager::set_rho,
+			py::arg("node_id"),
 			py::arg("rho_field"))
-		.def("defineEpsilonRField", &ElectrostaticSimManager::define_epsilon_r_field,
+		.def("setRhoField", &ElectrostaticSimManager::set_rho_field,
+			py::arg("rho_field"))
+		.def("setEpsilonRField", &ElectrostaticSimManager::set_epsilon_r_field,
 			py::arg("epsilon_r_field"))
 		.def("simulate", &ElectrostaticSimManager::simulate)
 		.def("getNbNodes", &ElectrostaticSimManager::get_nb_nodes)

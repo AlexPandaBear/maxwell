@@ -1,6 +1,13 @@
 #include "ElectrostaticSimManager.hxx"
 
-ElectrostaticSimManager::ElectrostaticSimManager() {}
+ElectrostaticSimManager::ElectrostaticSimManager(bool verbose) :
+	m_verbose(verbose)
+{
+	if (verbose)
+	{
+		std::cout << "Creating an electrostatic simulation environment [ OK ]" << std::endl;
+	}
+}
 
 ElectrostaticSimManager::~ElectrostaticSimManager() {}
 
@@ -23,11 +30,31 @@ void ElectrostaticSimManager::generate_cube_mesh(double x_min, double x_max, siz
 												double y_min, double y_max, size_t ny,
 												double z_min, double z_max, size_t nz)
 {
+	if (m_verbose)
+	{
+		std::cout << "Building the mesh ";
+	}
+
 	m_data.set_nb_nodes(nx*ny*nz);
 	m_mesh.generate_grid_mesh(x_min, x_max, y_min, y_max, z_min, z_max, nx, ny, nz);
+	
+	if (m_verbose)
+	{
+		std::cout << "[ OK ]" << std::endl;
+	}
 }
 
-void ElectrostaticSimManager::define_rho_field(ScalarField const& rho)
+void ElectrostaticSimManager::set_rho(size_t node_id, double rho)
+{
+	if (node_id >= m_data.get_nb_nodes())
+	{
+		throw std::invalid_argument("Wrong node number");
+	}
+
+	m_data.set_rho(node_id, rho);
+}
+
+void ElectrostaticSimManager::set_rho_field(ScalarField const& rho)
 {
 	if (rho.get_nb_nodes() != m_data.get_nb_nodes())
 	{
@@ -40,7 +67,7 @@ void ElectrostaticSimManager::define_rho_field(ScalarField const& rho)
 	}
 }
 
-void ElectrostaticSimManager::define_epsilon_r_field(ScalarField const& epsilon_r)
+void ElectrostaticSimManager::set_epsilon_r_field(ScalarField const& epsilon_r)
 {
 	if (epsilon_r.get_nb_nodes() != m_data.get_nb_nodes())
 	{
@@ -55,7 +82,7 @@ void ElectrostaticSimManager::define_epsilon_r_field(ScalarField const& epsilon_
 
 void ElectrostaticSimManager::simulate()
 {
-	ElectrostaticKernel kernel(m_mesh, m_data);
+	ElectrostaticKernel kernel(m_mesh, m_data, m_verbose);
 	kernel.simulate_phi();
 	kernel.derive_E();
 }

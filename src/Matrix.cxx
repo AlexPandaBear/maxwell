@@ -78,7 +78,7 @@ void Matrix::perform_matrix_vector_product(std::vector<double> const& V, std::ve
 	}
 
 
-	tbb::parallel_for((size_t) 0, m_nb_rows, [&](size_t k)
+	tbb::parallel_for((size_t) 0, m_nb_rows, [&V, &R, this](size_t k)
 	//for (size_t k = 0; k < m_nb_rows; k++)
 	{
 		R[k] = 0.;
@@ -126,4 +126,17 @@ double Matrix::perform_gauss_seidel_iteration(std::vector<double>& X, std::vecto
 	}
 
 	return residual_l2_norm2;
+}
+
+void Matrix::display() const
+{
+	for (size_t i = 0; i < m_nb_rows; i++)
+	{
+		for (size_t j = 0; j < m_nb_columns; j++)
+		{
+			std::cout << ptr_coefs[i*m_nb_columns + j] << " ";
+		}
+
+		std::cout << std::endl;
+	}
 }
