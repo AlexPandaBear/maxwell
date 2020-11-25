@@ -62,9 +62,9 @@ y_max = 1.
 z_min = -1.
 z_max = 1.
 
-nx = 10
-ny = 10
-nz = 10
+nx = 2
+ny = 2
+nz = 2
 
 S.generateCubeMesh(x_min, x_max, nx, y_min, y_max, ny, z_min, z_max, nz)
 

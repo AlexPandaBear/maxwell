@@ -1,26 +1,27 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include "DataKeeper.hxx"
 
 class DataProcessor
 {
 private:
-	DataKeeper& m_data;
+	DataKeeper const& m_data;
 
 	bool m_energy_ready;
 	bool m_poynting_ready;
 
-	std::vector<ScalarField> m_energy;
-	std::vector<VectorField> m_poynting;
-	std::vector<ScalarField> m_poynting_norm;
+	std::unique_ptr<std::vector<ScalarField>> ptr_energy;
+	std::unique_ptr<std::vector<VectorField>> ptr_poynting;
+	std::unique_ptr<std::vector<ScalarField>> ptr_poynting_norm;
 
 	void compute_energy();
 	void compute_poynting();
 	void compute_all();
 
 public:
-	DataProcessor(DataKeeper& data);
+	DataProcessor(DataKeeper const& data);
 	~DataProcessor();
 
 	ScalarField const& get_energy_density(size_t step);

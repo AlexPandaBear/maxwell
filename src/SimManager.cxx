@@ -1,9 +1,9 @@
 #include "SimManager.hxx"
 
 SimManager::SimManager() :
-	m_mesh(Mesh3D()),
-	m_data(DataKeeper()),
-	m_processor(DataProcessor(m_data)) 
+	m_mesh(),
+	m_data(),
+	m_processor(m_data) 
 {
 	std::cout << "Creation of the simulation environment [ OK ]" << std::endl;
 }
@@ -34,7 +34,6 @@ void SimManager::set_simulation_parameters(double t_max, size_t nb_steps, double
 	m_data.set_theta(theta);
 	m_data.set_accuracy(accuracy);
 	m_data.set_max_nb_iterations(max_nb_iterations);
-	m_mesh = Mesh3D();
 	m_mesh.generate_grid_mesh(x_min, x_max, y_min, y_max, z_min, z_max, nx, ny, nz);
 	m_data.reset_dimensions(nb_steps, m_mesh.get_nb_nodes(), m_mesh.get_nb_cells());
 	m_data.erase_BCs();

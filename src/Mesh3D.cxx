@@ -3,8 +3,8 @@
 Mesh3D::Mesh3D() :
 	m_nb_nodes(0),
 	m_nb_cells(0),
-	m_nodes_xyz(VectorField(0)),
-	m_cells(0, Cell(m_nodes_xyz)),
+	ptr_nodes_xyz(new VectorField(0)),
+	m_cells(0, Cell(*(ptr_nodes_xyz.get()))),
 	m_boundary_nodes() {}
 
 //Mesh3D::Mesh3D(std::string file) {} //TODO
@@ -21,7 +21,7 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	double dz((z_max-z_min)/(nz-1));
 
 
-	m_nodes_xyz = VectorField(m_nb_nodes);
+	ptr_nodes_xyz.reset(new VectorField(m_nb_nodes));
 
 	size_t id(0);
 
@@ -31,7 +31,7 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 		{
 			for (size_t k = 0; k < nz; k++)
 			{
-				m_nodes_xyz.set_value(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
+				ptr_nodes_xyz->set_value(id, x_min+i*dx, y_min+j*dy, z_min+k*dz);
 
 				if (i == 0 || i == nx-1 || j == 0 || j == ny-1 || k == 0 || k == nz-1)
 				{
@@ -44,7 +44,7 @@ void Mesh3D::generate_grid_mesh(double x_min, double x_max, double y_min, double
 	}
 
 
-	m_cells = std::vector<Cell>(m_nb_cells, Cell(m_nodes_xyz, 0, 0, 0, 0));
+	m_cells = std::vector<Cell>(m_nb_cells, Cell(*(ptr_nodes_xyz.get()), 0, 0, 0, 0));
 	id = 0;
 
 
@@ -111,7 +111,7 @@ size_t Mesh3D::get_nb_cells() const
 
 Vec3D Mesh3D::get_node_xyz(size_t node_id) const
 {
-	return m_nodes_xyz.get_value(node_id);
+	return ptr_nodes_xyz->get_value(node_id);
 }
 
 Cell const& Mesh3D::get_cell(size_t cell_id) const
@@ -143,7 +143,7 @@ std::vector<size_t> Mesh3D::get_neighbor_cells_id(size_t node_id) const
 
 VectorField const& Mesh3D::get_all_nodes_xyz() const
 {
-	return m_nodes_xyz;
+	return *(ptr_nodes_xyz.get());
 }
 
 std::vector<size_t> const& Mesh3D::get_boundary_nodes() const

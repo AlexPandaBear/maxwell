@@ -5,9 +5,9 @@ ElectrostaticDataKeeper::ElectrostaticDataKeeper():
 	m_nb_nodes(0),
 	m_accuracy(0.01),
 	m_max_nb_iterations(100),
-	m_rho(ScalarField(0)),
-	m_eps(ScalarField(0)),
-	m_E(VectorField(0)) {}
+	ptr_rho(new ScalarField(0)),
+	ptr_eps(new ScalarField(0)),
+	ptr_E(new VectorField(0)) {}
 
 ElectrostaticDataKeeper::~ElectrostaticDataKeeper() {}
 
@@ -19,9 +19,9 @@ size_t ElectrostaticDataKeeper::get_nb_nodes() const
 void ElectrostaticDataKeeper::set_nb_nodes(size_t nb_nodes)
 {
 	m_nb_nodes = nb_nodes;
-	m_rho = ScalarField(nb_nodes);
-	m_eps = ScalarField(nb_nodes, m_eps0);
-	m_E = VectorField(nb_nodes);
+	ptr_rho.reset(new ScalarField(nb_nodes));
+	ptr_eps.reset(new ScalarField(nb_nodes, m_eps0));
+	ptr_E.reset(new VectorField(nb_nodes));
 }
 
 double ElectrostaticDataKeeper::get_epsilon0() const
@@ -56,45 +56,45 @@ void ElectrostaticDataKeeper::set_accuracy(double accuracy)
 
 double ElectrostaticDataKeeper::get_rho(size_t node_nb) const
 {
-	return m_rho.get_value(node_nb);
+	return ptr_rho->get_value(node_nb);
 }
 
 double ElectrostaticDataKeeper::get_epsilon(size_t node_nb) const
 {
-	return m_eps.get_value(node_nb);
+	return ptr_eps->get_value(node_nb);
 }
 
 Vec3D ElectrostaticDataKeeper::get_E(size_t node_nb) const
 {
-	return m_E.get_value(node_nb);
+	return ptr_E->get_value(node_nb);
 }
 
 ScalarField const& ElectrostaticDataKeeper::get_rho() const
 {
-	return m_rho;
+	return *ptr_rho;
 }
 
 ScalarField const& ElectrostaticDataKeeper::get_epsilon() const
 {
-	return m_eps;
+	return *ptr_eps;
 }
 
 VectorField const& ElectrostaticDataKeeper::get_E() const
 {
-	return m_E;
+	return *ptr_E;
 }
 
 void ElectrostaticDataKeeper::set_rho(size_t node_nb, double rho)
 {
-	m_rho.set_value(node_nb, rho);
+	ptr_rho->set_value(node_nb, rho);
 }
 
 void ElectrostaticDataKeeper::set_epsilon_r(size_t node_nb, double epsilon_r)
 {
-	m_eps.set_value(node_nb, epsilon_r*m_eps0);
+	ptr_eps->set_value(node_nb, epsilon_r*m_eps0);
 }
 
 void ElectrostaticDataKeeper::set_E(size_t node_nb, Vec3D const& E)
 {
-	m_E.set_value(node_nb, E);
+	ptr_E->set_value(node_nb, E);
 }

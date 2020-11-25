@@ -5,6 +5,7 @@
 #include <list>
 #include <iostream>
 #include <string>
+#include <memory>
 #include "ScalarField.hxx"
 #include "VectorField.hxx"
 #include "Vec3D.hxx"
@@ -25,9 +26,8 @@ private:
 
 	std::vector<double> m_time;
 
-	std::vector<ScalarField> m_rho;
-	std::vector<VectorField> m_j;
-	std::vector<VectorField> m_E, m_B;
+	std::unique_ptr<std::vector<ScalarField>> ptr_rho;
+	std::unique_ptr<std::vector<VectorField>> ptr_j, ptr_E, ptr_B;
 
 	std::vector<size_t> m_BC;
 
@@ -66,16 +66,16 @@ public:
 	ScalarField const& get_rho(size_t step) const;
 	void set_rho(size_t t, size_t node_nb, double rho);
 
-	Vec3D get_j(size_t t, size_t node_nb);
+	Vec3D get_j(size_t t, size_t node_nb) const;
 	VectorField const& get_j(size_t step) const;
 	void set_j(size_t t, size_t node_nb, Vec3D j);
 
-	Vec3D get_E(size_t t, size_t node_nb);
+	Vec3D get_E(size_t t, size_t node_nb) const;
 	VectorField const& get_E(size_t step) const;
 	void set_E(size_t t, size_t node_nb, Vec3D E);
 	void set_E(size_t t, VectorField const& E);
 	
-	Vec3D get_B(size_t t, size_t node_nb);
+	Vec3D get_B(size_t t, size_t node_nb) const;
 	VectorField const& get_B(size_t step) const;
 	void set_B(size_t t, size_t node_nb, Vec3D B);
 	void set_B(size_t t, VectorField const& B);

@@ -12,10 +12,10 @@ DataKeeper::DataKeeper() :
 	m_nb_nodes(0),
 	m_nb_cells(0),
 	m_time(std::vector<double>()),
-	m_rho(std::vector<ScalarField>(0, ScalarField(0))),
-	m_j(std::vector<VectorField>(0, VectorField(0))),
-	m_E(std::vector<VectorField>(0, VectorField(0))),
-	m_B(std::vector<VectorField>(0, VectorField(0))),
+	ptr_rho(new std::vector<ScalarField>(0, ScalarField(0))),
+	ptr_j(new std::vector<VectorField>(0, VectorField(0))),
+	ptr_E(new std::vector<VectorField>(0, VectorField(0))),
+	ptr_B(new std::vector<VectorField>(0, VectorField(0))),
 	m_BC(std::vector<size_t>()) {}
 
 //DataKeeper::DataKeeper(std::string file) {} //TODO
@@ -79,10 +79,10 @@ void DataKeeper::reset_dimensions(size_t nb_steps, size_t nb_nodes, size_t nb_ce
 	m_nb_cells = nb_cells;
 
 	m_time = std::vector<double>(nb_steps+1, 0.);
-	m_rho = std::vector<ScalarField>(nb_steps+1, ScalarField(nb_nodes));
-	m_j = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
-	m_E = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
-	m_B = std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes));
+	ptr_rho.reset(new std::vector<ScalarField>(nb_steps+1, ScalarField(nb_nodes)));
+	ptr_j.reset(new std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes)));
+	ptr_E.reset(new std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes)));
+	ptr_B.reset(new std::vector<VectorField>(nb_steps+1, VectorField(nb_nodes)));
 
 	erase_BCs();
 }
@@ -139,77 +139,77 @@ void DataKeeper::set_time(size_t step, double time)
 
 double DataKeeper::get_rho(size_t t, size_t node_nb) const
 {
-	return m_rho[t].get_value(node_nb);
+	return (*ptr_rho)[t].get_value(node_nb);
 }
 
 ScalarField const& DataKeeper::get_rho(size_t step) const
 {
-	return m_rho[step];
+	return (*ptr_rho)[step];
 }
 
 void DataKeeper::set_rho(size_t t, size_t node_nb, double rho)
 {
-	m_rho[t].set_value(node_nb, rho);
+	(*ptr_rho)[t].set_value(node_nb, rho);
 }
 
-Vec3D DataKeeper::get_j(size_t t, size_t node_nb)
+Vec3D DataKeeper::get_j(size_t t, size_t node_nb) const
 {
-	return m_j[t].get_value(node_nb);
+	return (*ptr_j)[t].get_value(node_nb);
 }
 
 VectorField const& DataKeeper::get_j(size_t step) const
 {
-	return m_j[step];
+	return (*ptr_j)[step];
 }
 
 void DataKeeper::set_j(size_t t, size_t node_nb, Vec3D j)
 {
-	m_j[t].set_value(node_nb, j);
+	(*ptr_j)[t].set_value(node_nb, j);
 }
 
-Vec3D DataKeeper::get_E(size_t t, size_t node_nb)
+Vec3D DataKeeper::get_E(size_t t, size_t node_nb) const
 {
-	return m_E[t].get_value(node_nb);
+	return (*ptr_E)[t].get_value(node_nb);
 }
 
 VectorField const& DataKeeper::get_E(size_t step) const
 {
-	return m_E[step];
+	return (*ptr_E)[step];
 }
 
 void DataKeeper::set_E(size_t t, size_t node_nb, Vec3D E)
 {
-	m_E[t].set_value(node_nb, E);
+	(*ptr_E)[t].set_value(node_nb, E);
 }
 
 void DataKeeper::set_E(size_t t, VectorField const& E)
 {
 	for (size_t n = 0; n < m_nb_nodes; n++)
 	{
-		m_E[t].set_value(n, E.get_value(n));
+		(*ptr_E)[t].set_value(n, E.get_value(n));
 	}
 }
 
-Vec3D DataKeeper::get_B(size_t t, size_t node_nb)
+Vec3D DataKeeper::get_B(size_t t, size_t node_nb) const
 {
-	return m_B[t].get_value(node_nb);
+	return (*ptr_B)[t].get_value(node_nb);
 }
 
 VectorField const& DataKeeper::get_B(size_t step) const
 {
-	return m_B[step];
+	return (*ptr_B)[step];
 }
 
 void DataKeeper::set_B(size_t t, size_t node_nb, Vec3D B)
 {
-	m_B[t].set_value(node_nb, B);
+	(*ptr_B)[t].set_value(node_nb, B);
 }
 
 void DataKeeper::set_B(size_t t, VectorField const& B)
 {
 	for (size_t n = 0; n < m_nb_nodes; n++)
 	{
-		m_B[t].set_value(n, B.get_value(n));
+		(*ptr_B)[t].set_value(n, B.get_value(n));
 	}
 }
 
@@ -229,7 +229,7 @@ Vec3D DataKeeper::get_boundary_condition_E(size_t node_nb)
 	{
 		if (m_BC[i] == node_nb)
 		{
-			return m_E[0].get_value(node_nb);
+			return (*ptr_E)[0].get_value(node_nb);
 		}
 	}
 
@@ -242,7 +242,7 @@ Vec3D DataKeeper::get_boundary_condition_B(size_t node_nb)
 	{
 		if (m_BC[i] == node_nb)
 		{
-			return m_B[0].get_value(node_nb);
+			return (*ptr_B)[0].get_value(node_nb);
 		}
 	}
 

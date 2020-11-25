@@ -1,6 +1,6 @@
 #include "ElectrostaticKernel.hxx"
 
-ElectrostaticKernel::ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper data) :
+ElectrostaticKernel::ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data) :
 	m_mesh(mesh),
 	m_data(data),
 	mat_A(data.get_nb_nodes()),

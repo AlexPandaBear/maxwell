@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "ScalarField.hxx"
 #include "VectorField.hxx"
 
@@ -11,8 +12,8 @@ private:
 	double m_accuracy;
 	size_t m_max_nb_iterations;
 
-	ScalarField m_rho, m_eps;
-	VectorField m_E;
+	std::unique_ptr<ScalarField> ptr_rho, ptr_eps;
+	std::unique_ptr<VectorField> ptr_E;
 
 public:
 	ElectrostaticDataKeeper();

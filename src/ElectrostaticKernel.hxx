@@ -18,7 +18,7 @@ private:
 	void build_vector_B();
 
 public:
-	ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper data);
+	ElectrostaticKernel(Mesh3D& mesh, ElectrostaticDataKeeper& data);
 	~ElectrostaticKernel();
 
 	void simulate_phi();

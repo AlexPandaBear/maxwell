@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <memory>
 #include "Cell.hxx"
 #include "VectorField.hxx"
 
@@ -13,7 +14,7 @@ private:
 	size_t m_nb_nodes;
 	size_t m_nb_cells;
 
-	VectorField m_nodes_xyz;
+	std::unique_ptr<VectorField> ptr_nodes_xyz;
 	std::vector<Cell> m_cells;
 	std::vector<size_t> m_boundary_nodes;
 
