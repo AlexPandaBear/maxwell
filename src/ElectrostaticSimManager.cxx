@@ -112,6 +112,11 @@ ScalarField const& ElectrostaticSimManager::get_epsilon() const
 	return m_data.get_epsilon();
 }
 
+ScalarField const& ElectrostaticSimManager::get_phi() const
+{
+	return m_data.get_phi();
+}
+
 VectorField const& ElectrostaticSimManager::get_E() const
 {
 	return m_data.get_E();

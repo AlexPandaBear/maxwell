@@ -112,6 +112,7 @@ PYBIND11_MODULE(_maxwell, m)
 		.def("getMesh", &ElectrostaticSimManager::get_mesh)
 		.def("getRho", &ElectrostaticSimManager::get_rho)
 		.def("getEpsilon", &ElectrostaticSimManager::get_epsilon)
+		.def("getPhi", &ElectrostaticSimManager::get_phi)
 		.def("getE", &ElectrostaticSimManager::get_E);
 
 	py::class_<Vec3D>(m, "Vec3D")

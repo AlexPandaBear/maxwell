@@ -5,6 +5,8 @@ project ( maxwell CXX )
 enable_testing ()
 
 
+
+
 # RPATH settings
 set ( CMAKE_SKIP_BUILD_RPATH  FALSE )
 set ( CMAKE_BUILD_WITH_INSTALL_RPATH FALSE )
@@ -15,10 +17,16 @@ if ( "${isSystemDir}" STREQUAL "-1" )
 endif ( "${isSystemDir}" STREQUAL "-1" )
 
 
-include_directories(${CMAKE_SOURCE_DIR}/../../TBB/include)
-link_directories(${CMAKE_SOURCE_DIR}/../../TBB/build/linux_intel64_gcc_cc8.3.0_libc2.28_kernel4.19.0_release)
 
 
+# TBB
+include_directories( ${CMAKE_SOURCE_DIR}/../../TBB/include )
+link_directories( ${CMAKE_SOURCE_DIR}/../../TBB/build/linux_intel64_gcc_cc8.3.0_libc2.28_kernel4.19.0_release )
+
+
+
+
+# CXX LIBRARY
 add_library ( maxwell SHARED SimManager.cxx UnsteadyMaxwellKernel.cxx Mesh3D.cxx Cell.cxx DataKeeper.cxx DataProcessor.cxx Vec3D.cxx ScalarField.cxx VectorField.cxx Matrix.cxx MatrixFEM.cxx ElectrostaticSimManager.cxx ElectrostaticKernel.cxx ElectrostaticDataKeeper.cxx )
 target_link_libraries(maxwell tbb)
 install (
@@ -27,6 +35,19 @@ install (
   )
 
 
+
+
+# TESTS
+add_executable( test_matrix test_matrix.cxx )
+target_link_libraries( test_matrix maxwell )
+
+add_executable( test_vec3D test_vec3D.cxx )
+target_link_libraries( test_vec3D maxwell )
+
+
+
+
+# REFERENCE DOCUMENTATION
 find_program ( DOXYGEN_EXECUTABLE
   NAMES doxygen
   DOC /usr/ 
@@ -45,13 +66,12 @@ add_custom_target ( reference_doc
 )
 
 
-# Détection des prérequis
+
+
+# PYTHON LIBRARY
 find_package ( PythonInterp 3.0 REQUIRED )
 find_package ( pybind11 REQUIRED )
 
-
-# Construction du module Python (import _maxwell) avec Pybind11
-# NOTA: décommenter au besoin si installation de Pybind11 hors système
 #include_directories ( /chemin/vers/pybind11/pybind11.h/si/installation/hors/path/std )
 pybind11_add_module ( _maxwell MODULE Interface.cxx )
 target_link_libraries ( _maxwell PUBLIC maxwell )

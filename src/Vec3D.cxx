@@ -120,6 +120,11 @@ void Vec3D::normalize()
 	(*this) /= compute_norm();
 }
 
+void Vec3D::display() const
+{
+	std::cout << "[ " << m_x << " " << m_y << " " << m_z << " ]^T" << std::endl;
+}
+
 bool Vec3D::operator==(Vec3D const& v) const
 {
 	if (v.get_x() != get_x() || v.get_y() != get_y() || v.get_z() != get_z())

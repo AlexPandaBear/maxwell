@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 /**
  * A class representing a 3-component vector (x, y, z) of real numbers, with data stored inside the obect (local data / default behavior) or as a view on 3 outside variables (distant data / view behavior - obtained when initialized with pointers)
@@ -148,6 +149,11 @@ public:
 	 * @warning The values of all the components will be irreversibly modified when calling this method
 	 */
 	void normalize();
+
+	/**
+	 * A method displaying on the console the vector represented by the instance
+	 */
+	void display() const;
 
 	/**
 	 * A boolean operator checking the equality of two vectors

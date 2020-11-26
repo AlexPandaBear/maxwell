@@ -43,6 +43,7 @@ void ElectrostaticKernel::build_matrix_A()
 	for (size_t j = 1; j < m_data.get_nb_nodes(); j++)
 	{
 		mat_A.set_coef(0, j, 0.);
+		//mat_A.set_coef(j, 0, 0.);
 	}
 
 	if (m_verbose)
@@ -80,6 +81,8 @@ void ElectrostaticKernel::build_vector_B()
 		}
 	}
 
+	vec_B[0] = 0.;
+
 	if (m_verbose)
 	{
 		std::cout << "[ OK ]" << std::endl;
@@ -115,7 +118,7 @@ void ElectrostaticKernel::simulate_phi()
 		}
 	}
 	while (residual > accuracy and it < max_nb_iterations);
-
+/*
 	if (it == max_nb_iterations and residual > accuracy)
 	{
 		if (m_verbose)
@@ -124,6 +127,11 @@ void ElectrostaticKernel::simulate_phi()
 		}
 
 		throw std::runtime_error("Maximum number of iterations reached before convergence");
+	}
+*/
+	for (size_t n = 0; n < m_data.get_nb_nodes(); n++)
+	{
+		m_data.set_phi(n, vec_X[n]);
 	}
 
 	if (m_verbose)

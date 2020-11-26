@@ -140,3 +140,18 @@ void Matrix::display() const
 		std::cout << std::endl;
 	}
 }
+
+void Matrix::display_matricial_system(std::vector<double> const& X, std::vector<double> const& B) const
+{
+	for (size_t i = 0; i < m_nb_rows; i++)
+	{
+		std::cout << "[ ";
+
+		for (size_t j = 0; j < m_nb_columns; j++)
+		{
+			std::cout << ptr_coefs[i*m_nb_columns + j] << " ";
+		}
+
+		std::cout << "] [ " << X[i] << " ] [ " << B[i] << " ]" << std::endl;
+	}
+}

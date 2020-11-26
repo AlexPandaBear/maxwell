@@ -37,4 +37,5 @@ public:
 	double perform_gauss_seidel_iteration(std::vector<double>& X, std::vector<double> const& B) const;
 
 	void display() const;
+	void display_matricial_system(std::vector<double> const& X, std::vector<double> const& B) const;
 };

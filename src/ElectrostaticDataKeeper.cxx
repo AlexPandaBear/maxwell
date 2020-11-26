@@ -7,6 +7,7 @@ ElectrostaticDataKeeper::ElectrostaticDataKeeper():
 	m_max_nb_iterations(100),
 	ptr_rho(new ScalarField(0)),
 	ptr_eps(new ScalarField(0)),
+	ptr_phi(new ScalarField(0)),
 	ptr_E(new VectorField(0)) {}
 
 ElectrostaticDataKeeper::~ElectrostaticDataKeeper() {}
@@ -21,6 +22,7 @@ void ElectrostaticDataKeeper::set_nb_nodes(size_t nb_nodes)
 	m_nb_nodes = nb_nodes;
 	ptr_rho.reset(new ScalarField(nb_nodes));
 	ptr_eps.reset(new ScalarField(nb_nodes, m_eps0));
+	ptr_phi.reset(new ScalarField(nb_nodes));
 	ptr_E.reset(new VectorField(nb_nodes));
 }
 
@@ -64,6 +66,11 @@ double ElectrostaticDataKeeper::get_epsilon(size_t node_nb) const
 	return ptr_eps->get_value(node_nb);
 }
 
+double ElectrostaticDataKeeper::get_phi(size_t node_nb) const
+{
+	return ptr_phi->get_value(node_nb);
+}
+
 Vec3D ElectrostaticDataKeeper::get_E(size_t node_nb) const
 {
 	return ptr_E->get_value(node_nb);
@@ -79,6 +86,11 @@ ScalarField const& ElectrostaticDataKeeper::get_epsilon() const
 	return *ptr_eps;
 }
 
+ScalarField const& ElectrostaticDataKeeper::get_phi() const
+{
+	return *ptr_phi;
+}
+
 VectorField const& ElectrostaticDataKeeper::get_E() const
 {
 	return *ptr_E;
@@ -92,6 +104,11 @@ void ElectrostaticDataKeeper::set_rho(size_t node_nb, double rho)
 void ElectrostaticDataKeeper::set_epsilon_r(size_t node_nb, double epsilon_r)
 {
 	ptr_eps->set_value(node_nb, epsilon_r*m_eps0);
+}
+
+void ElectrostaticDataKeeper::set_phi(size_t node_nb, double phi)
+{
+	ptr_phi->set_value(node_nb, phi);
 }
 
 void ElectrostaticDataKeeper::set_E(size_t node_nb, Vec3D const& E)

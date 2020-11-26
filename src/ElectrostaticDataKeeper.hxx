@@ -12,7 +12,7 @@ private:
 	double m_accuracy;
 	size_t m_max_nb_iterations;
 
-	std::unique_ptr<ScalarField> ptr_rho, ptr_eps;
+	std::unique_ptr<ScalarField> ptr_rho, ptr_eps, ptr_phi;
 	std::unique_ptr<VectorField> ptr_E;
 
 public:
@@ -33,13 +33,16 @@ public:
 
 	double get_rho(size_t node_nb) const;
 	double get_epsilon(size_t node_nb) const;
+	double get_phi(size_t node_nb) const;
 	Vec3D get_E(size_t node_nb) const;
 
 	ScalarField const& get_rho() const;
 	ScalarField const& get_epsilon() const;
+	ScalarField const& get_phi() const;
 	VectorField const& get_E() const;
 
 	void set_rho(size_t node_nb, double rho);
 	void set_epsilon_r(size_t node_nb, double epsilon_r);
+	void set_phi(size_t node_nb, double phi);
 	void set_E(size_t node_nb, Vec3D const& E);
 };

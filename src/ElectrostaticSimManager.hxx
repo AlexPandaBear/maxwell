@@ -35,5 +35,6 @@ public:
 	VectorField const& get_mesh() const;
 	ScalarField const& get_rho() const;
 	ScalarField const& get_epsilon() const;
+	ScalarField const& get_phi() const;
 	VectorField const& get_E() const;	
 };
